@@ -1,0 +1,64 @@
+# Node
+node_modules/
+npm-debug.log
+yarn-error.log
+bun.lockb.tmp
+
+# Build outputs
+dist/
+build/
+*.tsbuildinfo
+
+# Hardhat
+cache/
+artifacts/
+typechain-types/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+
+# Documentation
+docs/
+*.md
+!README.md
+
+# Tests
+test/
+coverage/
+*.test.ts
+*.spec.ts
+
+# Logs
+logs/
+*.log
+
+# Deployments (except production config)
+deployments/*.json
+!deployments/latest.json
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
