@@ -3,10 +3,12 @@ import { motion } from 'framer-motion';
 import { Shield, Loader2 } from 'lucide-react';
 import { useWriteContract, useWaitForTransactionReceipt, useReadContract } from 'wagmi';
 import { parseAbi, parseEther } from 'viem';
+import { useTranslation } from 'react-i18next';
 import { CONTRACTS } from '../../config/contracts';
 import { agentIdentityRegistryAbi } from '../../config/abis';
 
 export function RegistrationCard() {
+  const { t } = useTranslation();
   const [agentName, setAgentName] = useState('');
   const [agentURI, setAgentURI] = useState('');
 
@@ -54,8 +56,8 @@ export function RegistrationCard() {
         <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
           <Shield className="w-8 h-8 text-white" />
         </div>
-        <h2 className="text-2xl font-bold text-white mb-2">Registration Successful!</h2>
-        <p className="text-violet-100">Your agent identity has been created. Refresh to view your profile.</p>
+        <h2 className="text-2xl font-bold text-white mb-2">{t('profile.registrationSuccess')}</h2>
+        <p className="text-violet-100">{t('profile.registrationSuccessDesc')}</p>
       </motion.div>
     );
   }
@@ -71,9 +73,9 @@ export function RegistrationCard() {
         <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
           <Shield className="w-10 h-10 text-white" />
         </div>
-        <h1 className="text-3xl font-bold text-white mb-2">Become an Agent</h1>
+        <h1 className="text-3xl font-bold text-white mb-2">{t('profile.becomeAgent')}</h1>
         <p className="text-violet-100 max-w-md mx-auto">
-          Register your AI agent on-chain and start earning rewards by completing bounties
+          {t('profile.becomeAgentDesc')}
         </p>
       </div>
 
@@ -82,13 +84,13 @@ export function RegistrationCard() {
         <div className="space-y-6 max-w-md mx-auto">
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">
-              Agent Name
+              {t('profile.agentName')}
             </label>
             <input
               type="text"
               value={agentName}
               onChange={(e) => setAgentName(e.target.value)}
-              placeholder="Enter agent name"
+              placeholder={t('profile.enterAgentName')}
               className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent"
               disabled={isPending || isConfirming}
             />
@@ -96,13 +98,13 @@ export function RegistrationCard() {
 
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">
-              Agent URI (optional)
+              {t('profile.agentUri')}
             </label>
             <input
               type="text"
               value={agentURI}
               onChange={(e) => setAgentURI(e.target.value)}
-              placeholder="ipfs://... or https://... (auto-generated if empty)"
+              placeholder={t('profile.agentUriPlaceholder')}
               className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent"
               disabled={isPending || isConfirming}
             />
@@ -111,7 +113,7 @@ export function RegistrationCard() {
           {registrationFee && (
             <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
               <div className="flex justify-between items-center">
-                <span className="text-gray-400">Registration Fee:</span>
+                <span className="text-gray-400">{t('profile.registrationFee')}</span>
                 <span className="text-white font-semibold">
                   {(Number(registrationFee) / 1e18).toFixed(4)} ETH
                 </span>
@@ -133,12 +135,12 @@ export function RegistrationCard() {
             {isPending || isConfirming ? (
               <>
                 <Loader2 className="w-5 h-5 animate-spin" />
-                {isPending ? 'Waiting for approval...' : 'Confirming...'}
+                {isPending ? t('profile.waitingApproval') : t('profile.confirming')}
               </>
             ) : (
               <>
                 <Shield className="w-5 h-5" />
-                Register Agent
+                {t('profile.registerAgent')}
               </>
             )}
           </button>
@@ -146,14 +148,14 @@ export function RegistrationCard() {
           {hash && (
             <div className="text-center">
               <p className="text-sm text-gray-400">
-                Transaction submitted.{' '}
+                {t('profile.txSubmitted')}{' '}
                 <a
                   href={`https://explorer.testnet.monad.xyz/tx/${hash}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-violet-400 hover:text-violet-300 underline"
                 >
-                  View on Explorer
+                  {t('profile.viewOnExplorer')}
                 </a>
               </p>
             </div>

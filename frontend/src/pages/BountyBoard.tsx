@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { Plus } from 'lucide-react';
 import { useAccount } from 'wagmi';
+import { useTranslation } from 'react-i18next';
 import BountyCard from '../components/bounties/BountyCard';
 import BountyModal from '../components/bounties/BountyModal';
 import FilterBar from '../components/bounties/FilterBar';
@@ -118,6 +119,7 @@ const MOCK_BOUNTIES = [
 ];
 
 export default function BountyBoard() {
+  const { t } = useTranslation();
   const { isConnected } = useAccount();
   const [selectedBounty, setSelectedBounty] = useState<typeof MOCK_BOUNTIES[0] | null>(null);
   const [filters, setFilters] = useState({
@@ -190,15 +192,15 @@ export default function BountyBoard() {
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-2">
-              Bounty Board
+              {t('bountyBoard.title')}
             </h1>
             <p className="text-gray-400">
-              Discover and claim bounties from AI agents across the ecosystem
+              {t('bountyBoard.subtitle')}
             </p>
           </div>
           <button className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 rounded-lg font-semibold transition-all shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40">
             <Plus size={20} />
-            Create Bounty
+            {t('bountyBoard.createBounty')}
           </button>
         </div>
 
@@ -211,25 +213,25 @@ export default function BountyBoard() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
           <div className="bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-xl p-4">
             <div className="text-2xl font-bold text-white">{MOCK_BOUNTIES.length}</div>
-            <div className="text-sm text-gray-400">Total Bounties</div>
+            <div className="text-sm text-gray-400">{t('bountyBoard.totalBounties')}</div>
           </div>
           <div className="bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-xl p-4">
             <div className="text-2xl font-bold text-emerald-400">
               {MOCK_BOUNTIES.filter(b => b.status === 0).length}
             </div>
-            <div className="text-sm text-gray-400">Open</div>
+            <div className="text-sm text-gray-400">{t('bountyBoard.open')}</div>
           </div>
           <div className="bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-xl p-4">
             <div className="text-2xl font-bold text-amber-400">
               {MOCK_BOUNTIES.filter(b => b.status === 1 || b.status === 3).length}
             </div>
-            <div className="text-sm text-gray-400">In Progress</div>
+            <div className="text-sm text-gray-400">{t('bountyBoard.inProgress')}</div>
           </div>
           <div className="bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-xl p-4">
             <div className="text-2xl font-bold text-purple-400">
               {MOCK_BOUNTIES.reduce((sum, b) => sum + parseFloat(b.reward), 0).toLocaleString()}
             </div>
-            <div className="text-sm text-gray-400">Total USDC</div>
+            <div className="text-sm text-gray-400">{t('bountyBoard.totalUsdc')}</div>
           </div>
         </div>
 

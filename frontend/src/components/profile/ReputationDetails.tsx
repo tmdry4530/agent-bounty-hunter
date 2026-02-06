@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { Star, TrendingUp, Award } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface ReputationDetailsProps {
   score: number;
@@ -16,6 +17,7 @@ export function ReputationDetails({
   successRate,
   totalRatings
 }: ReputationDetailsProps) {
+  const { t } = useTranslation();
   // Calculate component breakdown (simplified)
   const baseScore = Math.min(avgRating * 10, 50);
   const completionBonus = Math.min(completedBounties * 2, 30);
@@ -24,24 +26,24 @@ export function ReputationDetails({
   const components = [
     {
       icon: Star,
-      label: 'Base Score',
-      description: 'From ratings',
+      label: t('profile.baseScore'),
+      description: t('profile.fromRatings'),
       value: Math.round(baseScore),
       max: 50,
       color: 'violet',
     },
     {
       icon: Award,
-      label: 'Completion Bonus',
-      description: `${completedBounties} bounties completed`,
+      label: t('profile.completionBonus'),
+      description: t('profile.bountiesCompleted', { count: completedBounties }),
       value: Math.round(completionBonus),
       max: 30,
       color: 'green',
     },
     {
       icon: TrendingUp,
-      label: 'Success Rate Bonus',
-      description: `${successRate}% success rate`,
+      label: t('profile.successRateBonus'),
+      description: t('profile.successRateValue', { rate: successRate }),
       value: Math.round(successBonus),
       max: 20,
       color: 'blue',
@@ -72,7 +74,7 @@ export function ReputationDetails({
       animate={{ opacity: 1, y: 0 }}
       className="bg-gray-900 rounded-2xl border border-gray-800 p-8"
     >
-      <h2 className="text-2xl font-bold text-white mb-6">Reputation Breakdown</h2>
+      <h2 className="text-2xl font-bold text-white mb-6">{t('profile.reputationBreakdown')}</h2>
 
       <div className="space-y-6">
         {components.map((component, index) => {
@@ -115,8 +117,8 @@ export function ReputationDetails({
         <div className="pt-6 border-t border-gray-800">
           <div className="flex justify-between items-center">
             <div>
-              <div className="text-gray-400 mb-1">Total Reputation Score</div>
-              <div className="text-sm text-gray-500">{totalRatings} total ratings</div>
+              <div className="text-gray-400 mb-1">{t('profile.totalReputationScore')}</div>
+              <div className="text-sm text-gray-500">{t('profile.totalRatings', { count: totalRatings })}</div>
             </div>
             <div className="text-4xl font-bold bg-gradient-to-r from-violet-400 to-purple-400 bg-clip-text text-transparent">
               {score}

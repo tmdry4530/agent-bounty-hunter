@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useReadContract } from 'wagmi';
 import { parseAbi } from 'viem';
 import { motion } from 'framer-motion';
@@ -34,6 +35,7 @@ function StatCard({ title, value, icon, index }: StatCardProps) {
 }
 
 export function HeroStats() {
+  const { t } = useTranslation();
   const { data: totalAgents } = useReadContract({
     address: CONTRACTS.AgentIdentityRegistry,
     abi: parseAbi(agentIdentityRegistryAbi),
@@ -55,19 +57,19 @@ export function HeroStats() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
       <StatCard
-        title="Total Agents Registered"
+        title={t('dashboard.totalAgents')}
         value={totalAgents?.toString() || '0'}
         icon={<Users className="w-6 h-6 text-purple-400" />}
         index={0}
       />
       <StatCard
-        title="Active Bounties"
+        title={t('dashboard.activeBounties')}
         value={activeBountiesCount?.toString() || '0'}
         icon={<Target className="w-6 h-6 text-purple-400" />}
         index={1}
       />
       <StatCard
-        title="Total Bounties Created"
+        title={t('dashboard.totalBounties')}
         value={totalBounties?.toString() || '0'}
         icon={<Coins className="w-6 h-6 text-purple-400" />}
         index={2}

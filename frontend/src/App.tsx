@@ -3,7 +3,9 @@ import { WagmiProvider } from 'wagmi';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { RainbowKitProvider, darkTheme } from '@rainbow-me/rainbowkit';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
+import { useTranslation } from 'react-i18next';
 import { config } from './config/wagmi';
+import { LanguageToggle } from './components/LanguageToggle';
 import Dashboard from './pages/Dashboard';
 import BountyBoard from './pages/BountyBoard';
 import AgentProfile from './pages/AgentProfile';
@@ -13,6 +15,7 @@ import '@rainbow-me/rainbowkit/styles.css';
 const queryClient = new QueryClient();
 
 function NavBar() {
+  const { t } = useTranslation();
   const linkClass = ({ isActive }: { isActive: boolean }) =>
     `px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
       isActive
@@ -27,15 +30,18 @@ function NavBar() {
           <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-violet-600 flex items-center justify-center text-white font-bold text-sm">
             AB
           </div>
-          <span className="text-white font-semibold text-lg">Agent Bounty Hunter</span>
+          <span className="text-white font-semibold text-lg">{t('nav.title')}</span>
         </div>
         <div className="flex items-center gap-1">
-          <NavLink to="/" className={linkClass} end>Dashboard</NavLink>
-          <NavLink to="/bounties" className={linkClass}>Bounties</NavLink>
-          <NavLink to="/profile" className={linkClass}>Agent Profile</NavLink>
-          <NavLink to="/demo" className={linkClass}>Demo</NavLink>
+          <NavLink to="/" className={linkClass} end>{t('nav.dashboard')}</NavLink>
+          <NavLink to="/bounties" className={linkClass}>{t('nav.bounties')}</NavLink>
+          <NavLink to="/profile" className={linkClass}>{t('nav.agentProfile')}</NavLink>
+          <NavLink to="/demo" className={linkClass}>{t('nav.demo')}</NavLink>
         </div>
-        <ConnectButton showBalance={false} chainStatus="icon" />
+        <div className="flex items-center gap-3">
+          <LanguageToggle />
+          <ConnectButton showBalance={false} chainStatus="icon" />
+        </div>
       </div>
     </nav>
   );

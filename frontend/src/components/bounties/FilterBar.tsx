@@ -1,4 +1,5 @@
 import { Search, Filter } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface FilterBarProps {
   filters: {
@@ -11,22 +12,23 @@ interface FilterBarProps {
   onFilterChange: (key: string, value: string | number | null) => void;
 }
 
-const STATUS_OPTIONS = [
-  { label: 'All', value: null },
-  { label: 'Open', value: 0 },
-  { label: 'Claimed', value: 1 },
-  { label: 'Submitted', value: 3 },
-  { label: 'Completed', value: 8 },
-];
-
 export default function FilterBar({ filters, onFilterChange }: FilterBarProps) {
+  const { t } = useTranslation();
+
+  const STATUS_OPTIONS = [
+    { label: t('bountyBoard.all'), value: null },
+    { label: t('bountyBoard.open'), value: 0 },
+    { label: t('bountyBoard.claimed'), value: 1 },
+    { label: t('bountyBoard.submitted'), value: 3 },
+    { label: t('bountyBoard.completed'), value: 8 },
+  ];
   return (
     <div className="bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-xl p-6 space-y-4">
       {/* Status Pills */}
       <div>
         <label className="text-sm font-medium text-gray-400 mb-2 flex items-center gap-2">
           <Filter size={16} />
-          Status
+          {t('bountyBoard.status')}
         </label>
         <div className="flex flex-wrap gap-2">
           {STATUS_OPTIONS.map((option) => (
@@ -49,20 +51,20 @@ export default function FilterBar({ filters, onFilterChange }: FilterBarProps) {
         {/* Reward Range */}
         <div className="md:col-span-2">
           <label className="text-sm font-medium text-gray-400 mb-2 block">
-            Reward Range (USDC)
+            {t('bountyBoard.rewardRange')}
           </label>
           <div className="flex items-center gap-2">
             <input
               type="number"
-              placeholder="Min"
+              placeholder={t('bountyBoard.min')}
               value={filters.minReward}
               onChange={(e) => onFilterChange('minReward', e.target.value)}
               className="flex-1 bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
             />
-            <span className="text-gray-600">to</span>
+            <span className="text-gray-600">{t('bountyBoard.to')}</span>
             <input
               type="number"
-              placeholder="Max"
+              placeholder={t('bountyBoard.max')}
               value={filters.maxReward}
               onChange={(e) => onFilterChange('maxReward', e.target.value)}
               className="flex-1 bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
@@ -73,7 +75,7 @@ export default function FilterBar({ filters, onFilterChange }: FilterBarProps) {
         {/* Min Reputation */}
         <div>
           <label className="text-sm font-medium text-gray-400 mb-2 block">
-            Min Reputation
+            {t('bountyBoard.minReputation')}
           </label>
           <input
             type="number"
@@ -87,13 +89,13 @@ export default function FilterBar({ filters, onFilterChange }: FilterBarProps) {
         {/* Search */}
         <div>
           <label className="text-sm font-medium text-gray-400 mb-2 block">
-            Search
+            {t('bountyBoard.search')}
           </label>
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={18} />
             <input
               type="text"
-              placeholder="Search title..."
+              placeholder={t('bountyBoard.searchTitle')}
               value={filters.searchQuery}
               onChange={(e) => onFilterChange('searchQuery', e.target.value)}
               className="w-full bg-gray-800 border border-gray-700 rounded-lg pl-10 pr-4 py-2 text-white placeholder-gray-500 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"

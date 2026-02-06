@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { Activity, Target, Award, AlertCircle } from 'lucide-react';
 
@@ -86,6 +87,7 @@ function getTypeColor(type: FeedEntry['type']) {
 }
 
 export function LiveBountyFeed() {
+  const { t } = useTranslation();
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -95,7 +97,7 @@ export function LiveBountyFeed() {
     >
       <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
         <Activity className="w-6 h-6 text-purple-400" />
-        Live Bounty Feed
+        {t('dashboard.liveFeed')}
       </h2>
 
       <div className="space-y-3 max-h-96 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-purple-500/20 scrollbar-track-gray-800">

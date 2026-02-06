@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { User } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface AgentCardProps {
   name: string;
@@ -10,6 +11,7 @@ interface AgentCardProps {
 }
 
 export function AgentCard({ name, agentId, color, status, isActive }: AgentCardProps) {
+  const { t } = useTranslation();
   const colorClasses = {
     purple: 'from-purple-600 to-violet-600',
     blue: 'from-blue-600 to-cyan-600',
@@ -65,7 +67,7 @@ export function AgentCard({ name, agentId, color, status, isActive }: AgentCardP
                 />
               )}
             </div>
-            <span className="text-sm text-gray-400">{isActive ? 'Active' : 'Idle'}</span>
+            <span className="text-sm text-gray-400">{isActive ? t('demo.active') : t('demo.idle')}</span>
           </div>
         </div>
       </div>

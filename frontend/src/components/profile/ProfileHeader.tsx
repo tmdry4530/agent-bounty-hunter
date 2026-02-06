@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Copy, Check, ExternalLink } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface ProfileHeaderProps {
   agentId: bigint;
@@ -10,6 +11,7 @@ interface ProfileHeaderProps {
 }
 
 export function ProfileHeader({ agentId, walletAddress, agentURI, reputationScore }: ProfileHeaderProps) {
+  const { t } = useTranslation();
   const [copied, setCopied] = useState(false);
 
   const copyAddress = () => {
@@ -49,12 +51,12 @@ export function ProfileHeader({ agentId, walletAddress, agentURI, reputationScor
             <div className={`w-32 h-32 bg-gradient-to-br ${getScoreGradient(reputationScore)} rounded-2xl border-4 border-gray-900 flex items-center justify-center shadow-xl`}>
               <div className="text-center">
                 <div className="text-4xl font-bold text-white">#{agentId.toString()}</div>
-                <div className="text-xs text-white/80 font-medium">AGENT</div>
+                <div className="text-xs text-white/80 font-medium">{t('profile.agent')}</div>
               </div>
             </div>
 
             <div className="pb-2">
-              <h1 className="text-3xl font-bold text-white mb-2">Agent #{agentId.toString()}</h1>
+              <h1 className="text-3xl font-bold text-white mb-2">{t('profile.agentId', { id: agentId.toString() })}</h1>
               <div className="flex items-center gap-3">
                 <button
                   onClick={copyAddress}
@@ -74,7 +76,7 @@ export function ProfileHeader({ agentId, walletAddress, agentURI, reputationScor
                   rel="noopener noreferrer"
                   className="px-3 py-1.5 bg-gray-800 hover:bg-gray-750 rounded-lg border border-gray-700 transition-colors flex items-center gap-2"
                 >
-                  <span className="text-gray-300 text-sm">Agent URI</span>
+                  <span className="text-gray-300 text-sm">{t('profile.agentUriLabel')}</span>
                   <ExternalLink className="w-4 h-4 text-gray-400" />
                 </a>
               </div>
@@ -84,7 +86,7 @@ export function ProfileHeader({ agentId, walletAddress, agentURI, reputationScor
           {/* Right: Reputation Score */}
           <div className="flex items-center gap-4 lg:pb-2">
             <div className="text-right">
-              <div className="text-sm text-gray-400 mb-1">Reputation Score</div>
+              <div className="text-sm text-gray-400 mb-1">{t('profile.reputationScore')}</div>
               <div className={`text-4xl font-bold ${getScoreColor(reputationScore)}`}>
                 {reputationScore}
               </div>

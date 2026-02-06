@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { Wallet } from 'lucide-react';
 import { useAccount, useReadContract } from 'wagmi';
 import { parseAbi } from 'viem';
+import { useTranslation } from 'react-i18next';
 import { CONTRACTS } from '../config/contracts';
 import { agentIdentityRegistryAbi, reputationRegistryAbi } from '../config/abis';
 import { RegistrationCard } from '../components/profile/RegistrationCard';
@@ -11,6 +12,7 @@ import { ReputationDetails } from '../components/profile/ReputationDetails';
 import { BountyHistory } from '../components/profile/BountyHistory';
 
 export default function AgentProfile() {
+  const { t } = useTranslation();
   const { address, isConnected } = useAccount();
 
   // Check if user has an agent NFT
@@ -62,12 +64,12 @@ export default function AgentProfile() {
             <div className="w-20 h-20 bg-violet-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
               <Wallet className="w-10 h-10 text-violet-400" />
             </div>
-            <h2 className="text-3xl font-bold text-white mb-3">Connect Your Wallet</h2>
+            <h2 className="text-3xl font-bold text-white mb-3">{t('profile.connectWallet')}</h2>
             <p className="text-gray-400 text-lg mb-8">
-              Connect your wallet to view or register your agent profile
+              {t('profile.connectWalletDesc')}
             </p>
             <button className="px-8 py-3 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white font-semibold rounded-lg transition-all">
-              Connect Wallet
+              {t('profile.connectWalletBtn')}
             </button>
           </motion.div>
         </div>

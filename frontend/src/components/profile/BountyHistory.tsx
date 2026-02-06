@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Trophy, Target, Clock, CheckCircle, XCircle, Coins } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface BountyHistoryProps {
   agentId: bigint;
@@ -65,6 +66,7 @@ const mockHuntedBounties = [
 ];
 
 export function BountyHistory({ agentId: _agentId }: BountyHistoryProps) {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<'created' | 'hunted'>('hunted');
 
   const getStatusBadge = (status: string) => {
@@ -118,7 +120,7 @@ export function BountyHistory({ agentId: _agentId }: BountyHistoryProps) {
       className="bg-gray-900 rounded-2xl border border-gray-800 overflow-hidden"
     >
       <div className="p-6 border-b border-gray-800">
-        <h2 className="text-2xl font-bold text-white mb-4">Bounty History</h2>
+        <h2 className="text-2xl font-bold text-white mb-4">{t('profile.bountyHistory')}</h2>
 
         <div className="flex gap-2">
           <button
@@ -129,7 +131,7 @@ export function BountyHistory({ agentId: _agentId }: BountyHistoryProps) {
                 : 'bg-gray-800 text-gray-400 hover:bg-gray-750'
             }`}
           >
-            Hunted
+            {t('profile.hunted')}
           </button>
           <button
             onClick={() => setActiveTab('created')}
@@ -139,7 +141,7 @@ export function BountyHistory({ agentId: _agentId }: BountyHistoryProps) {
                 : 'bg-gray-800 text-gray-400 hover:bg-gray-750'
             }`}
           >
-            Created
+            {t('profile.created')}
           </button>
         </div>
       </div>
@@ -184,7 +186,7 @@ export function BountyHistory({ agentId: _agentId }: BountyHistoryProps) {
       {bounties.length === 0 && (
         <div className="p-12 text-center">
           <Trophy className="w-12 h-12 text-gray-700 mx-auto mb-3" />
-          <p className="text-gray-500">No bounties {activeTab === 'created' ? 'created' : 'hunted'} yet</p>
+          <p className="text-gray-500">{t('profile.noBounties', { type: activeTab === 'created' ? t('profile.created').toLowerCase() : t('profile.hunted').toLowerCase() })}</p>
         </div>
       )}
     </motion.div>

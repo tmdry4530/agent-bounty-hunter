@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { Clock, Coins, Shield, ChevronRight } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface BountyCardProps {
   bounty: {
@@ -16,8 +17,6 @@ interface BountyCardProps {
   onClick: () => void;
 }
 
-const STATUS_LABELS = ['Open', 'Claimed', 'In Progress', 'Submitted', 'Under Review', 'Approved', 'Rejected', 'Disputed', 'Paid', 'Cancelled', 'Expired'];
-
 const STATUS_COLORS: Record<number, string> = {
   0: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
   1: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
@@ -33,8 +32,14 @@ const STATUS_COLORS: Record<number, string> = {
 };
 
 export default function BountyCard({ bounty, onClick }: BountyCardProps) {
+  const { t } = useTranslation();
   const timeLeft = bounty.deadline - Date.now();
   const daysLeft = Math.ceil(timeLeft / (1000 * 60 * 60 * 24));
+
+  const getStatusLabel = (status: number) => {
+    const keys = ['open', 'claimed', 'inProgress', 'submitted', 'underReview', 'approved', 'rejected', 'disputed', 'paid', 'cancelled', 'expired'];
+    return t(`bountyStatus.${keys[status]}`);
+  };
 
   return (
     <motion.div
@@ -57,7 +62,7 @@ export default function BountyCard({ bounty, onClick }: BountyCardProps) {
         <span className="text-3xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
           {bounty.reward}
         </span>
-        <span className="text-gray-400 text-sm">USDC</span>
+        <span className="text-gray-400 text-sm">{t('common.usdc')}</span>
       </div>
 
       {/* Skills */}
@@ -77,24 +82,24 @@ export default function BountyCard({ bounty, onClick }: BountyCardProps) {
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-1">
             <Shield size={14} />
-            <span>Rep: {bounty.minRep}+</span>
+            <span>{t('bountyBoard.rep', { value: bounty.minRep })}</span>
           </div>
           <div className="flex items-center gap-1">
             <Clock size={14} />
             <span className={daysLeft <= 2 ? 'text-red-400' : ''}>
-              {daysLeft}d left
+              {t('bountyBoard.daysLeft', { days: daysLeft })}
             </span>
           </div>
         </div>
 
         <div className={`px-3 py-1 rounded-full text-xs border ${STATUS_COLORS[bounty.status] || STATUS_COLORS[0]}`}>
-          {STATUS_LABELS[bounty.status]}
+          {getStatusLabel(bounty.status)}
         </div>
       </div>
 
       {/* Creator */}
       <div className="mt-3 text-xs text-gray-500">
-        by Agent #{bounty.creator}
+        {t('bountyBoard.byAgent', { id: bounty.creator })}
       </div>
     </motion.div>
   );

@@ -1,5 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Clock, Coins, Shield, CheckCircle, AlertCircle } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface BountyModalProps {
   bounty: {
@@ -17,18 +18,23 @@ interface BountyModalProps {
   onClose: () => void;
 }
 
-const STATUS_LABELS = ['Open', 'Claimed', 'In Progress', 'Submitted', 'Under Review', 'Approved', 'Rejected', 'Disputed', 'Paid', 'Cancelled', 'Expired'];
-
-const LIFECYCLE_STEPS = [
-  { label: 'Open', status: 0 },
-  { label: 'Claimed', status: 1 },
-  { label: 'Submitted', status: 3 },
-  { label: 'Approved', status: 5 },
-  { label: 'Paid', status: 8 },
-];
-
 export default function BountyModal({ bounty, isConnected, onClose }: BountyModalProps) {
+  const { t } = useTranslation();
+
   if (!bounty) return null;
+
+  const getStatusLabel = (status: number) => {
+    const keys = ['open', 'claimed', 'inProgress', 'submitted', 'underReview', 'approved', 'rejected', 'disputed', 'paid', 'cancelled', 'expired'];
+    return t(`bountyStatus.${keys[status]}`);
+  };
+
+  const LIFECYCLE_STEPS = [
+    { label: t('bountyStatus.open'), status: 0 },
+    { label: t('bountyStatus.claimed'), status: 1 },
+    { label: t('bountyStatus.submitted'), status: 3 },
+    { label: t('bountyStatus.approved'), status: 5 },
+    { label: t('bountyStatus.paid'), status: 8 },
+  ];
 
   const currentStepIndex = LIFECYCLE_STEPS.findIndex(step => step.status === bounty.status);
   const timeLeft = bounty.deadline - Date.now();
@@ -38,7 +44,7 @@ export default function BountyModal({ bounty, isConnected, onClose }: BountyModa
     if (!isConnected) {
       return (
         <button className="w-full py-3 px-6 bg-gray-700 text-gray-400 rounded-lg font-semibold cursor-not-allowed">
-          Connect Wallet to Interact
+          {t('bountyModal.connectWallet')}
         </button>
       );
     }
@@ -47,38 +53,38 @@ export default function BountyModal({ bounty, isConnected, onClose }: BountyModa
       case 0: // Open
         return (
           <button className="w-full py-3 px-6 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-lg font-semibold transition-all">
-            Claim Bounty
+            {t('bountyModal.claimBounty')}
           </button>
         );
       case 1: // Claimed
       case 2: // In Progress
         return (
           <button className="w-full py-3 px-6 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-lg font-semibold transition-all">
-            Submit Work
+            {t('bountyModal.submitWork')}
           </button>
         );
       case 3: // Submitted
         return (
           <div className="flex gap-3">
             <button className="flex-1 py-3 px-6 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white rounded-lg font-semibold transition-all">
-              Approve
+              {t('bountyModal.approve')}
             </button>
             <button className="flex-1 py-3 px-6 bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 text-white rounded-lg font-semibold transition-all">
-              Reject
+              {t('bountyModal.reject')}
             </button>
           </div>
         );
       case 5: // Approved
         return (
           <button className="w-full py-3 px-6 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white rounded-lg font-semibold transition-all">
-            Release Payment
+            {t('bountyModal.releasePayment')}
           </button>
         );
       case 8: // Paid
         return (
           <div className="w-full py-3 px-6 bg-green-500/20 border border-green-500/50 text-green-400 rounded-lg font-semibold text-center flex items-center justify-center gap-2">
             <CheckCircle size={20} />
-            Bounty Completed
+            {t('bountyModal.bountyCompleted')}
           </div>
         );
       default:
@@ -108,13 +114,13 @@ export default function BountyModal({ bounty, isConnected, onClose }: BountyModa
             <div className="flex-1">
               <h2 className="text-2xl font-bold text-white mb-2">{bounty.title}</h2>
               <div className="flex items-center gap-4 text-sm text-gray-400">
-                <span>Bounty #{bounty.id}</span>
+                <span>{t('bountyBoard.bountyId', { id: bounty.id })}</span>
                 <span>•</span>
-                <span>by Agent #{bounty.creator}</span>
+                <span>{t('bountyBoard.byAgent', { id: bounty.creator })}</span>
                 {bounty.hunter && (
                   <>
                     <span>•</span>
-                    <span>claimed by Agent #{bounty.hunter}</span>
+                    <span>{t('bountyBoard.claimedByAgent', { id: bounty.hunter })}</span>
                   </>
                 )}
               </div>
@@ -134,12 +140,12 @@ export default function BountyModal({ bounty, isConnected, onClose }: BountyModa
               <div className="flex items-center gap-3">
                 <Coins className="text-purple-400" size={32} />
                 <div>
-                  <div className="text-sm text-gray-400 mb-1">Reward</div>
+                  <div className="text-sm text-gray-400 mb-1">{t('bountyModal.reward')}</div>
                   <div className="flex items-baseline gap-2">
                     <span className="text-4xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
                       {bounty.reward}
                     </span>
-                    <span className="text-gray-400">USDC</span>
+                    <span className="text-gray-400">{t('common.usdc')}</span>
                   </div>
                 </div>
               </div>
@@ -147,7 +153,7 @@ export default function BountyModal({ bounty, isConnected, onClose }: BountyModa
 
             {/* Lifecycle Stepper */}
             <div className="bg-gray-800/50 rounded-xl p-6">
-              <h3 className="text-lg font-semibold text-white mb-6">Bounty Lifecycle</h3>
+              <h3 className="text-lg font-semibold text-white mb-6">{t('bountyModal.lifecycle')}</h3>
               <div className="relative">
                 {/* Progress Line */}
                 <div className="absolute top-5 left-0 right-0 h-1 bg-gray-700">
@@ -197,30 +203,30 @@ export default function BountyModal({ bounty, isConnected, onClose }: BountyModa
               {/* Current Status */}
               <div className="mt-6 pt-6 border-t border-gray-700">
                 <div className="flex items-center gap-2 text-sm">
-                  <span className="text-gray-400">Current Status:</span>
-                  <span className="text-white font-semibold">{STATUS_LABELS[bounty.status]}</span>
+                  <span className="text-gray-400">{t('bountyModal.currentStatus')}</span>
+                  <span className="text-white font-semibold">{getStatusLabel(bounty.status)}</span>
                 </div>
               </div>
             </div>
 
             {/* Requirements */}
             <div>
-              <h3 className="text-lg font-semibold text-white mb-3">Requirements</h3>
+              <h3 className="text-lg font-semibold text-white mb-3">{t('bountyModal.requirements')}</h3>
               <div className="grid grid-cols-2 gap-4">
                 <div className="bg-gray-800/50 rounded-lg p-4">
                   <div className="flex items-center gap-2 mb-2">
                     <Shield className="text-purple-400" size={18} />
-                    <span className="text-sm text-gray-400">Minimum Reputation</span>
+                    <span className="text-sm text-gray-400">{t('bountyModal.minReputation')}</span>
                   </div>
                   <span className="text-2xl font-bold text-white">{bounty.minRep}</span>
                 </div>
                 <div className="bg-gray-800/50 rounded-lg p-4">
                   <div className="flex items-center gap-2 mb-2">
                     <Clock className="text-purple-400" size={18} />
-                    <span className="text-sm text-gray-400">Time Remaining</span>
+                    <span className="text-sm text-gray-400">{t('bountyModal.timeRemaining')}</span>
                   </div>
                   <span className={`text-2xl font-bold ${daysLeft <= 2 ? 'text-red-400' : 'text-white'}`}>
-                    {daysLeft} days
+                    {t('bountyModal.days', { count: daysLeft })}
                   </span>
                 </div>
               </div>
@@ -228,7 +234,7 @@ export default function BountyModal({ bounty, isConnected, onClose }: BountyModa
 
             {/* Skills */}
             <div>
-              <h3 className="text-lg font-semibold text-white mb-3">Required Skills</h3>
+              <h3 className="text-lg font-semibold text-white mb-3">{t('bountyModal.requiredSkills')}</h3>
               <div className="flex flex-wrap gap-2">
                 {bounty.skills.map((skill, idx) => (
                   <span
@@ -251,7 +257,7 @@ export default function BountyModal({ bounty, isConnected, onClose }: BountyModa
               <div className="flex items-start gap-3 bg-amber-500/10 border border-amber-500/30 rounded-lg p-4">
                 <AlertCircle className="text-amber-400 flex-shrink-0 mt-0.5" size={20} />
                 <div className="text-sm text-amber-300">
-                  Connect your wallet to claim bounties, submit work, or manage your bounties.
+                  {t('bountyModal.walletWarning')}
                 </div>
               </div>
             )}

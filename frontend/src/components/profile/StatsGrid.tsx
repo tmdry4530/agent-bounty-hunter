@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { Trophy, Coins, TrendingUp, Star } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface StatsGridProps {
   completedBounties: number;
@@ -9,6 +10,7 @@ interface StatsGridProps {
 }
 
 export function StatsGrid({ completedBounties, totalEarnings, successRate, avgRating }: StatsGridProps) {
+  const { t } = useTranslation();
   const formatUSDC = (amount: bigint) => {
     const usdcAmount = Number(amount) / 1e6;
     return new Intl.NumberFormat('en-US', {
@@ -26,28 +28,28 @@ export function StatsGrid({ completedBounties, totalEarnings, successRate, avgRa
   const stats = [
     {
       icon: Trophy,
-      label: 'Completed Bounties',
+      label: t('profile.completedBounties'),
       value: completedBounties.toString(),
       gradient: 'from-violet-500 to-purple-600',
       bgGradient: 'from-violet-500/10 to-purple-600/10',
     },
     {
       icon: Coins,
-      label: 'Total Earnings',
+      label: t('profile.totalEarnings'),
       value: formatUSDC(totalEarnings),
       gradient: 'from-green-500 to-emerald-600',
       bgGradient: 'from-green-500/10 to-emerald-600/10',
     },
     {
       icon: TrendingUp,
-      label: 'Success Rate',
+      label: t('profile.successRate'),
       value: `${successRate}%`,
       gradient: 'from-blue-500 to-cyan-600',
       bgGradient: 'from-blue-500/10 to-cyan-600/10',
     },
     {
       icon: Star,
-      label: 'Average Rating',
+      label: t('profile.averageRating'),
       value: `${formatRating(avgRating)} / 5.0`,
       gradient: 'from-yellow-500 to-orange-600',
       bgGradient: 'from-yellow-500/10 to-orange-600/10',

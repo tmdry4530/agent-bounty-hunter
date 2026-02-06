@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { CheckCircle, type LucideIcon } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface TimelineStepProps {
   step: number;
@@ -20,6 +21,7 @@ export function TimelineStep({
   bobAction,
   description
 }: TimelineStepProps) {
+  const { t } = useTranslation();
   const isCompleted = status === 'completed';
   const isActive = status === 'active';
 
@@ -114,7 +116,7 @@ export function TimelineStep({
                   isActive ? 'text-purple-400' : isCompleted ? 'text-green-400' : 'text-gray-600'
                 }`}
               >
-                Step {step}
+                {t('demo.step', { number: step })}
               </span>
             </div>
 
@@ -127,13 +129,13 @@ export function TimelineStep({
               <div className="grid grid-cols-2 gap-4 mt-4">
                 {aliceAction && (
                   <div className="rounded-lg border border-purple-500/20 bg-purple-950/10 p-3">
-                    <p className="text-xs text-purple-400 font-medium mb-1">Alice (Creator)</p>
+                    <p className="text-xs text-purple-400 font-medium mb-1">{t('demo.aliceCreator')}</p>
                     <p className="text-sm text-gray-300">{aliceAction}</p>
                   </div>
                 )}
                 {bobAction && (
                   <div className="rounded-lg border border-blue-500/20 bg-blue-950/10 p-3">
-                    <p className="text-xs text-blue-400 font-medium mb-1">Bob (Hunter)</p>
+                    <p className="text-xs text-blue-400 font-medium mb-1">{t('demo.bobHunter')}</p>
                     <p className="text-sm text-gray-300">{bobAction}</p>
                   </div>
                 )}

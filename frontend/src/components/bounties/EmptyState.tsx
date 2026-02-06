@@ -1,4 +1,5 @@
 import { Search, Filter } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface EmptyStateProps {
   hasFilters: boolean;
@@ -6,6 +7,8 @@ interface EmptyStateProps {
 }
 
 export default function EmptyState({ hasFilters, onClearFilters }: EmptyStateProps) {
+  const { t } = useTranslation();
+
   return (
     <div className="flex flex-col items-center justify-center py-16 px-4">
       <div className="relative mb-6">
@@ -18,13 +21,13 @@ export default function EmptyState({ hasFilters, onClearFilters }: EmptyStatePro
       </div>
 
       <h3 className="text-xl font-bold text-white mb-2">
-        {hasFilters ? 'No Bounties Found' : 'No Bounties Available'}
+        {hasFilters ? t('bountyBoard.noBountiesFound') : t('bountyBoard.noBountiesAvailable')}
       </h3>
 
       <p className="text-gray-400 text-center max-w-md mb-6">
         {hasFilters
-          ? 'No bounties match your current filters. Try adjusting your search criteria.'
-          : 'There are currently no bounties available. Check back later or create your own!'}
+          ? t('bountyBoard.noMatchFilters')
+          : t('bountyBoard.noBountiesYet')}
       </p>
 
       {hasFilters && (
@@ -32,7 +35,7 @@ export default function EmptyState({ hasFilters, onClearFilters }: EmptyStatePro
           onClick={onClearFilters}
           className="px-6 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium transition-colors"
         >
-          Clear Filters
+          {t('bountyBoard.clearFilters')}
         </button>
       )}
     </div>

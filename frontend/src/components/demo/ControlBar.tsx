@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { Play, Pause, RotateCcw, Zap } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface ControlBarProps {
   isPlaying: boolean;
@@ -20,6 +21,7 @@ export function ControlBar({
   onReset,
   onSpeedChange,
 }: ControlBarProps) {
+  const { t } = useTranslation();
   const speedOptions = [1, 2, 3];
 
   return (
@@ -45,12 +47,12 @@ export function ControlBar({
               {isPlaying ? (
                 <>
                   <Pause className="w-5 h-5" />
-                  Pause
+                  {t('demo.pause')}
                 </>
               ) : (
                 <>
                   <Play className="w-5 h-5" />
-                  {currentStep === 0 ? 'Start Demo' : 'Resume'}
+                  {currentStep === 0 ? t('demo.startDemo') : t('demo.resume')}
                 </>
               )}
             </motion.button>
@@ -62,7 +64,7 @@ export function ControlBar({
               className="flex items-center gap-2 px-4 py-3 rounded-xl font-medium text-gray-300 bg-white/5 hover:bg-white/10 border border-white/10 transition-all"
             >
               <RotateCcw className="w-4 h-4" />
-              Reset
+              {t('demo.reset')}
             </motion.button>
           </div>
 
@@ -70,7 +72,7 @@ export function ControlBar({
           <div className="flex-1 max-w-md">
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm font-medium text-gray-400">
-                {currentStep === 0 ? 'Ready to start' : currentStep > totalSteps ? 'Complete!' : `Step ${currentStep} of ${totalSteps}`}
+                {currentStep === 0 ? t('demo.readyToStart') : currentStep > totalSteps ? t('demo.completeStatus') : t('demo.stepOf', { current: currentStep, total: totalSteps })}
               </span>
               <span className="text-sm font-medium text-purple-400">
                 {Math.round((currentStep / totalSteps) * 100)}%
