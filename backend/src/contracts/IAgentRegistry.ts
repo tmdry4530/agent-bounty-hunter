@@ -1,22 +1,33 @@
-// ERC-8004 Agent Registry Interface
+// AgentIdentityRegistry Interface (ERC-721 based)
 export const IAgentRegistryABI = [
   // Events
-  'event AgentRegistered(uint256 indexed agentId, address indexed wallet, address indexed owner, string registrationURI)',
-  'event MetadataUpdated(uint256 indexed agentId, string key, string value)',
-  'event FeedbackSubmitted(uint256 indexed fromAgentId, uint256 indexed toAgentId, uint8 rating, string comment)',
-  
-  // Agent Management
-  'function registerAgent(string registrationURI) external returns (uint256)',
-  'function updateMetadata(uint256 agentId, string key, string value) external',
-  'function getAgent(uint256 agentId) external view returns (address wallet, address owner, string registrationURI, bool active)',
-  'function getAgentByWallet(address wallet) external view returns (uint256)',
-  'function getMetadata(uint256 agentId, string key) external view returns (string)',
-  
-  // Reputation
-  'function submitFeedback(uint256 toAgentId, uint256 bountyId, uint8 rating, string comment) external',
-  'function getReputation(uint256 agentId) external view returns (uint256 score, uint256 totalFeedbacks)',
-  
+  'event Registered(uint256 indexed agentId, string agentURI, address indexed owner)',
+  'event MetadataSet(uint256 indexed agentId, string key, bytes value)',
+  'event AgentWalletSet(uint256 indexed agentId, address wallet)',
+  'event AgentURIUpdated(uint256 indexed agentId, string newURI)',
+  'event RegistrationFeeUpdated(uint256 newFee)',
+
+  // Registration
+  'function register(string agentURI) external payable returns (uint256)',
+
+  // Metadata Management
+  'function getMetadata(uint256 agentId, string key) external view returns (bytes)',
+  'function setMetadata(uint256 agentId, string key, bytes value) external',
+
+  // Wallet Management
+  'function getAgentWallet(uint256 agentId) external view returns (address)',
+  'function setAgentWallet(uint256 agentId, address newWallet, uint256 deadline, bytes signature) external',
+
+  // URI Management
+  'function tokenURI(uint256 agentId) external view returns (string)',
+  'function setAgentURI(uint256 agentId, string newURI) external',
+
   // Views
   'function totalAgents() external view returns (uint256)',
-  'function isActive(uint256 agentId) external view returns (bool)'
+  'function registrationFee() external view returns (uint256)',
+
+  // ERC-721 Standard Functions
+  'function ownerOf(uint256 tokenId) external view returns (address)',
+  'function balanceOf(address owner) external view returns (uint256)',
+  'function tokenOfOwnerByIndex(address owner, uint256 index) external view returns (uint256)'
 ] as const;

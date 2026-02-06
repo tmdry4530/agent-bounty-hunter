@@ -6,7 +6,8 @@
   "scripts": {
     "demo": "bun run demo.ts",
     "demo:quick": "bun run demo.ts --quick",
-    "demo:verbose": "bun run demo.ts --verbose"
+    "demo:verbose": "bun run demo.ts --verbose",
+    "demo:scenario": "bun run demo-scenario.ts"
   },
   "dependencies": {
     "ethers": "^6.10.0",

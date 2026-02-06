@@ -10,9 +10,8 @@
     "resolveJsonModule": true,
     "moduleResolution": "node",
     "outDir": "./dist",
-    "rootDir": "./",
-    "types": ["node", "mocha", "chai"]
+    "rootDir": "./"
   },
-  "include": ["./test", "./scripts", "./typechain-types"],
-  "exclude": ["node_modules"]
+  "include": ["./test", "./scripts", "./typechain-types", "./hardhat.config.ts"],
+  "exclude": ["node_modules", "backend", "sdk", "demo", "api", "test/integration/e2e.test.ts"]
 }

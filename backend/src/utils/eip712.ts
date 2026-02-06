@@ -54,7 +54,7 @@ export function getEIP712Domain(): EIP712Domain {
   return {
     name: process.env.EIP712_DOMAIN_NAME || 'AgentBountyHunter',
     version: process.env.EIP712_DOMAIN_VERSION || '1',
-    chainId: parseInt(process.env.CHAIN_ID || '41454'),
+    chainId: parseInt(process.env.CHAIN_ID || '143'),
     verifyingContract: process.env.EIP712_VERIFYING_CONTRACT || ethers.ZeroAddress
   };
 }

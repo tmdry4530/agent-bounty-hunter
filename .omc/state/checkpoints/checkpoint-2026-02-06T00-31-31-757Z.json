@@ -1,0 +1,19 @@
+{
+  "created_at": "2026-02-06T00:31:31.754Z",
+  "trigger": "auto",
+  "active_modes": {
+    "ralph": {
+      "iteration": 2,
+      "prompt": ""
+    },
+    "ultrawork": {
+      "original_prompt": "/oh-my-claudecode:ralph ralph: execute the plan at .omc/plans/agent-bounty-hunter-rebuild.md starting from Phase 0 through Phase 5. Fix all 43 verified bugs, rewrite backend to Bun+Hono+Drizzle, build indexer, SDK, and Docker setup. Don't stop until all phases pass their acceptance criteria and verification commands."
+    }
+  },
+  "todo_summary": {
+    "pending": 0,
+    "in_progress": 0,
+    "completed": 0
+  },
+  "wisdom_exported": false
+}

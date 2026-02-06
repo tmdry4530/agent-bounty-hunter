@@ -40,7 +40,7 @@ describe("AgentIdentityRegistry", function () {
 
   describe("Agent Registration - Basic", function () {
     it("Should register an agent with correct fee", async function () {
-      const tx = await registry.connect(agent1).register(TEST_URI, {
+      const tx = await registry.connect(agent1)["register(string)"](TEST_URI, {
         value: REGISTRATION_FEE
       });
       
@@ -52,35 +52,35 @@ describe("AgentIdentityRegistry", function () {
     });
 
     it("Should assign sequential agent IDs", async function () {
-      await registry.connect(agent1).register(TEST_URI, { value: REGISTRATION_FEE });
-      await registry.connect(agent2).register(TEST_URI, { value: REGISTRATION_FEE });
-      await registry.connect(agent3).register(TEST_URI, { value: REGISTRATION_FEE });
+      await registry.connect(agent1)["register(string)"](TEST_URI, { value: REGISTRATION_FEE });
+      await registry.connect(agent2)["register(string)"](TEST_URI, { value: REGISTRATION_FEE });
+      await registry.connect(agent3)["register(string)"](TEST_URI, { value: REGISTRATION_FEE });
       
       expect(await registry.totalAgents()).to.equal(3);
     });
 
     it("Should mint NFT to registrant", async function () {
-      await registry.connect(agent1).register(TEST_URI, { value: REGISTRATION_FEE });
+      await registry.connect(agent1)["register(string)"](TEST_URI, { value: REGISTRATION_FEE });
       
       expect(await registry.ownerOf(1)).to.equal(agent1.address);
       expect(await registry.balanceOf(agent1.address)).to.equal(1);
     });
 
     it("Should set agent wallet to owner by default", async function () {
-      await registry.connect(agent1).register(TEST_URI, { value: REGISTRATION_FEE });
+      await registry.connect(agent1)["register(string)"](TEST_URI, { value: REGISTRATION_FEE });
       
       expect(await registry.getAgentWallet(1)).to.equal(agent1.address);
     });
 
     it("Should return correct token URI", async function () {
-      await registry.connect(agent1).register(TEST_URI, { value: REGISTRATION_FEE });
+      await registry.connect(agent1)["register(string)"](TEST_URI, { value: REGISTRATION_FEE });
       
       expect(await registry.tokenURI(1)).to.equal(TEST_URI);
     });
 
     it("Should reject registration with insufficient fee", async function () {
       await expect(
-        registry.connect(agent1).register(TEST_URI, {
+        registry.connect(agent1)["register(string)"](TEST_URI, {
           value: REGISTRATION_FEE - 1n
         })
       ).to.be.revertedWithCustomError(registry, "InsufficientFee");
@@ -90,7 +90,7 @@ describe("AgentIdentityRegistry", function () {
       const excessFee = REGISTRATION_FEE + ethers.parseEther("0.5");
       
       await expect(
-        registry.connect(agent1).register(TEST_URI, { value: excessFee })
+        registry.connect(agent1)["register(string)"](TEST_URI, { value: excessFee })
       ).to.not.be.reverted;
     });
   });
@@ -139,7 +139,7 @@ describe("AgentIdentityRegistry", function () {
   describe("Metadata Management", function () {
     beforeEach(async function () {
       // Register an agent first
-      await registry.connect(agent1).register(TEST_URI, { value: REGISTRATION_FEE });
+      await registry.connect(agent1)["register(string)"](TEST_URI, { value: REGISTRATION_FEE });
     });
 
     it("Should allow owner to set metadata", async function () {
@@ -181,7 +181,7 @@ describe("AgentIdentityRegistry", function () {
 
   describe("Agent Wallet Management", function () {
     beforeEach(async function () {
-      await registry.connect(agent1).register(TEST_URI, { value: REGISTRATION_FEE });
+      await registry.connect(agent1)["register(string)"](TEST_URI, { value: REGISTRATION_FEE });
     });
 
     it("Should update agent wallet with valid signature", async function () {
@@ -288,7 +288,7 @@ describe("AgentIdentityRegistry", function () {
 
   describe("Agent URI Management", function () {
     beforeEach(async function () {
-      await registry.connect(agent1).register(TEST_URI, { value: REGISTRATION_FEE });
+      await registry.connect(agent1)["register(string)"](TEST_URI, { value: REGISTRATION_FEE });
     });
 
     it("Should allow owner to update URI", async function () {
@@ -329,8 +329,8 @@ describe("AgentIdentityRegistry", function () {
 
     it("Should allow owner to withdraw fees", async function () {
       // Register multiple agents
-      await registry.connect(agent1).register(TEST_URI, { value: REGISTRATION_FEE });
-      await registry.connect(agent2).register(TEST_URI, { value: REGISTRATION_FEE });
+      await registry.connect(agent1)["register(string)"](TEST_URI, { value: REGISTRATION_FEE });
+      await registry.connect(agent2)["register(string)"](TEST_URI, { value: REGISTRATION_FEE });
       
       const contractBalance = await ethers.provider.getBalance(await registry.getAddress());
       expect(contractBalance).to.equal(REGISTRATION_FEE * 2n);
@@ -357,7 +357,7 @@ describe("AgentIdentityRegistry", function () {
 
   describe("ERC-721 Compliance", function () {
     beforeEach(async function () {
-      await registry.connect(agent1).register(TEST_URI, { value: REGISTRATION_FEE });
+      await registry.connect(agent1)["register(string)"](TEST_URI, { value: REGISTRATION_FEE });
     });
 
     it("Should support NFT transfers", async function () {
@@ -400,15 +400,15 @@ describe("AgentIdentityRegistry", function () {
     });
 
     it("Should handle empty metadata gracefully", async function () {
-      await registry.connect(agent1).register(TEST_URI, { value: REGISTRATION_FEE });
+      await registry.connect(agent1)["register(string)"](TEST_URI, { value: REGISTRATION_FEE });
       
       const emptyData = await registry.getMetadata(1, "nonexistent");
       expect(emptyData).to.equal("0x");
     });
 
     it("Should allow same user to register multiple agents", async function () {
-      await registry.connect(agent1).register(TEST_URI, { value: REGISTRATION_FEE });
-      await registry.connect(agent1).register("ipfs://QmOther", { value: REGISTRATION_FEE });
+      await registry.connect(agent1)["register(string)"](TEST_URI, { value: REGISTRATION_FEE });
+      await registry.connect(agent1)["register(string)"]("ipfs://QmOther", { value: REGISTRATION_FEE });
       
       expect(await registry.balanceOf(agent1.address)).to.equal(2);
       expect(await registry.ownerOf(1)).to.equal(agent1.address);

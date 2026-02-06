@@ -218,7 +218,7 @@ contract BountyRegistry is ReentrancyGuard {
             address(escrow),
             params.rewardAmount
         );
-        escrow.deposit(bountyId, params.rewardToken, params.rewardAmount);
+        escrow.deposit(bountyId, params.rewardToken, params.rewardAmount, msg.sender);
         
         emit BountyCreated(
             bountyId, 
@@ -245,7 +245,7 @@ contract BountyRegistry is ReentrancyGuard {
         require(hunterAgentId != bounty.creatorAgentId, "Cannot claim own bounty");
         
         // Check reputation requirement
-        (uint256 reputation,) = reputationRegistry.getReputation(hunterAgentId);
+        uint256 reputation = reputationRegistry.getReputationScore(hunterAgentId);
         require(reputation >= bounty.minReputation, "Insufficient reputation");
         
         // Update state
@@ -320,17 +320,9 @@ contract BountyRegistry is ReentrancyGuard {
         
         BountyStatus oldStatus = bounty.status;
         bounty.status = BountyStatus.Approved;
-        
-        // Submit feedback to reputation system
-        reputationRegistry.submitFeedback(
-            creatorAgentId,
-            bounty.claimedBy,
-            bountyId,
-            rating,
-            feedbackURI,
-            keccak256(bytes(bounty.submissionURI))
-        );
-        reputationRegistry.recordCompletion(bounty.claimedBy, bountyId, true);
+
+        // Record completion with feedback in reputation system
+        reputationRegistry.recordCompletion(bounty.claimedBy, bountyId, bounty.rewardAmount, rating, feedbackURI);
         
         // Release payment from escrow
         escrow.release(bountyId);
@@ -362,9 +354,9 @@ contract BountyRegistry is ReentrancyGuard {
         
         BountyStatus oldStatus = bounty.status;
         bounty.status = BountyStatus.Rejected;
-        
+
         // Record failure in reputation
-        reputationRegistry.recordCompletion(bounty.claimedBy, bountyId, false);
+        reputationRegistry.recordFailure(bounty.claimedBy);
         
         // Refund to creator
         escrow.refund(bountyId);
@@ -438,9 +430,9 @@ contract BountyRegistry is ReentrancyGuard {
         BountyStatus oldStatus = bounty.status;
         bounty.status = BountyStatus.Expired;
         
-        // Refund if claimed but not submitted
+        // Record failure if claimed but not submitted
         if (bounty.claimedBy > 0) {
-            reputationRegistry.recordCompletion(bounty.claimedBy, bountyId, false);
+            reputationRegistry.recordFailure(bounty.claimedBy);
         }
         
         escrow.refund(bountyId);

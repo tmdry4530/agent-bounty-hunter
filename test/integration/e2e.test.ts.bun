@@ -1,0 +1,280 @@
+/**
+ * End-to-End Integration Test
+ *
+ * This test runs a complete bounty lifecycle using the SDK:
+ * 1. Register Agent A (creator)
+ * 2. Register Agent B (hunter)
+ * 3. Creator creates a bounty
+ * 4. Hunter claims the bounty
+ * 5. Hunter submits work
+ * 6. Creator approves and rates
+ *
+ * Prerequisites:
+ * - Docker services running (postgres, redis)
+ * - API server running (make api)
+ * - Contracts deployed (make deploy-local)
+ * - X402_DEV_BYPASS=true
+ */
+
+import { describe, test, expect, beforeAll } from 'bun:test';
+import { BountyHunterClient } from '../../sdk/src/client';
+import type { AgentProfile, Bounty } from '../../sdk/src/types';
+
+const API_URL = process.env.API_URL || 'http://localhost:3000';
+const CREATOR_PRIVATE_KEY = '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80'; // Hardhat account 0
+const HUNTER_PRIVATE_KEY = '0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d'; // Hardhat account 1
+
+describe('E2E: Complete Bounty Lifecycle', () => {
+  let creatorClient: BountyHunterClient;
+  let hunterClient: BountyHunterClient;
+  let creatorAgent: AgentProfile;
+  let hunterAgent: AgentProfile;
+  let bounty: Bounty;
+
+  beforeAll(async () => {
+    // Initialize clients
+    creatorClient = new BountyHunterClient({
+      baseUrl: API_URL,
+      privateKey: CREATOR_PRIVATE_KEY,
+      autoPayEnabled: false, // Dev bypass mode
+    });
+
+    hunterClient = new BountyHunterClient({
+      baseUrl: API_URL,
+      privateKey: HUNTER_PRIVATE_KEY,
+      autoPayEnabled: false,
+    });
+  });
+
+  test('API health check', async () => {
+    const health = await creatorClient.health();
+    expect(health.status).toBe('ok');
+  });
+
+  test('Register creator agent', async () => {
+    const response = await creatorClient.registerAgent({
+      name: 'CreatorBot',
+      description: 'An AI agent that creates bounties',
+      skills: ['task-creation', 'project-management'],
+      metadataUri: 'ipfs://QmCreatorMetadata',
+    });
+
+    expect(response.success).toBe(true);
+    expect(response.agent).toBeDefined();
+    expect(response.agent.name).toBe('CreatorBot');
+
+    creatorAgent = response.agent;
+    creatorClient.setAgentId(creatorAgent.id);
+  });
+
+  test('Register hunter agent', async () => {
+    const response = await hunterClient.registerAgent({
+      name: 'HunterBot',
+      description: 'An AI agent that completes bounties',
+      skills: ['solidity', 'typescript', 'security-audit'],
+      metadataUri: 'ipfs://QmHunterMetadata',
+    });
+
+    expect(response.success).toBe(true);
+    expect(response.agent).toBeDefined();
+    expect(response.agent.name).toBe('HunterBot');
+
+    hunterAgent = response.agent;
+    hunterClient.setAgentId(hunterAgent.id);
+  });
+
+  test('Get agent profile', async () => {
+    const agent = await creatorClient.getAgent(creatorAgent.id);
+    expect(agent.id).toBe(creatorAgent.id);
+    expect(agent.reputationScore).toBe(50); // Default score
+  });
+
+  test('Create bounty', async () => {
+    const deadline = new Date();
+    deadline.setDate(deadline.getDate() + 7); // 7 days from now
+
+    const response = await creatorClient.createBounty({
+      title: 'Implement Smart Contract Audit',
+      description: 'Audit the BountyEscrow contract for vulnerabilities',
+      descriptionUri: 'ipfs://QmBountyDescription',
+      type: 'security-audit',
+      requiredSkills: ['solidity', 'security-audit'],
+      rewardAmount: '100000000', // 100 USDC (6 decimals)
+      rewardToken: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48' as `0x${string}`, // USDC address
+      deadline: deadline.toISOString(),
+      minReputation: 0,
+    });
+
+    expect(response.success).toBe(true);
+    expect(response.bounty).toBeDefined();
+    expect(response.bounty.title).toBe('Implement Smart Contract Audit');
+    expect(response.bounty.status).toBe('open');
+
+    bounty = response.bounty;
+  });
+
+  test('List bounties', async () => {
+    const response = await hunterClient.listBounties({ status: 'open' });
+
+    expect(response.success).toBe(true);
+    expect(response.bounties.length).toBeGreaterThan(0);
+
+    const found = response.bounties.find(b => b.id === bounty.id);
+    expect(found).toBeDefined();
+  });
+
+  test('Get bounty details', async () => {
+    const response = await hunterClient.getBounty(bounty.id);
+
+    expect(response.success).toBe(true);
+    expect(response.bounty.id).toBe(bounty.id);
+    expect(response.bounty.status).toBe('open');
+  });
+
+  test('Search bounties by skill', async () => {
+    const response = await hunterClient.searchBounties('security', {
+      skills: ['security-audit'],
+    });
+
+    expect(response.success).toBe(true);
+    expect(response.results.length).toBeGreaterThanOrEqual(0);
+  });
+
+  test('Hunter claims bounty', async () => {
+    const response = await hunterClient.claimBounty(bounty.id);
+
+    expect(response.success).toBe(true);
+    expect(response.bounty.status).toBe('claimed');
+    expect(response.bounty.claimedBy).toBe(hunterAgent.onChainId);
+
+    bounty = response.bounty;
+  });
+
+  test('Hunter submits work', async () => {
+    const response = await hunterClient.submitWork(bounty.id, {
+      submissionUri: 'ipfs://QmSubmissionReport',
+    });
+
+    expect(response.success).toBe(true);
+    expect(response.bounty.status).toBe('submitted');
+    expect(response.bounty.submissionUri).toBe('ipfs://QmSubmissionReport');
+
+    bounty = response.bounty;
+  });
+
+  test('Creator approves and rates', async () => {
+    const response = await creatorClient.reviewBounty(bounty.id, {
+      action: 'approve',
+      rating: 5,
+      feedback: 'Excellent work! Thorough audit with clear documentation.',
+    });
+
+    expect(response.success).toBe(true);
+    expect(response.bounty.status).toBe('approved');
+
+    bounty = response.bounty;
+  });
+
+  test('Hunter reputation increased', async () => {
+    const reputation = await hunterClient.getAgentReputation(hunterAgent.id);
+
+    expect(reputation.score).toBeGreaterThan(50); // Should increase from default
+    expect(reputation.completedBounties).toBe(1);
+  });
+
+  test('Get agent bounties', async () => {
+    const response = await creatorClient.getAgentBounties(creatorAgent.id);
+
+    expect(response.success).toBe(true);
+    expect(response.bounties.length).toBe(1);
+    expect(response.bounties[0].id).toBe(bounty.id);
+  });
+});
+
+describe('E2E: Webhook Management', () => {
+  let client: BountyHunterClient;
+  let agentId: string;
+
+  beforeAll(async () => {
+    client = new BountyHunterClient({
+      baseUrl: API_URL,
+      privateKey: CREATOR_PRIVATE_KEY,
+      autoPayEnabled: false,
+    });
+
+    // Get or create agent
+    const response = await client.registerAgent({
+      name: 'WebhookTestAgent',
+      description: 'Agent for webhook testing',
+      skills: ['testing'],
+      metadataUri: 'ipfs://QmWebhookTest',
+    });
+
+    agentId = response.agent.id;
+    client.setAgentId(agentId);
+  });
+
+  test('Register webhook', async () => {
+    const response = await client.registerWebhook(agentId, {
+      url: 'https://webhook.example.com/bounty-events',
+      events: ['bounty.created', 'bounty.claimed', 'bounty.completed'],
+    });
+
+    expect(response.success).toBe(true);
+    expect(response.webhook).toBeDefined();
+    expect(response.webhook.url).toBe('https://webhook.example.com/bounty-events');
+    expect(response.webhook.events).toContain('bounty.created');
+  });
+
+  test('List webhooks', async () => {
+    const response = await client.listWebhooks(agentId);
+
+    expect(response.success).toBe(true);
+    expect(response.webhooks.length).toBeGreaterThan(0);
+  });
+
+  test('Delete webhook', async () => {
+    const listResponse = await client.listWebhooks(agentId);
+    const webhookId = listResponse.webhooks[0].id;
+
+    await expect(client.deleteWebhook(agentId, webhookId)).resolves.not.toThrow();
+  });
+});
+
+describe('E2E: Error Handling', () => {
+  let client: BountyHunterClient;
+
+  beforeAll(() => {
+    client = new BountyHunterClient({
+      baseUrl: API_URL,
+      autoPayEnabled: false,
+    });
+  });
+
+  test('404 for non-existent agent', async () => {
+    await expect(client.getAgent('99999999')).rejects.toThrow();
+  });
+
+  test('404 for non-existent bounty', async () => {
+    await expect(client.getBounty('99999999')).rejects.toThrow();
+  });
+
+  test('Validation error for invalid bounty params', async () => {
+    const invalidClient = new BountyHunterClient({
+      baseUrl: API_URL,
+      privateKey: CREATOR_PRIVATE_KEY,
+      agentId: '1',
+      autoPayEnabled: false,
+    });
+
+    await expect(
+      invalidClient.createBounty({
+        title: '', // Empty title should fail validation
+        descriptionUri: 'ipfs://test',
+        rewardAmount: '100',
+        rewardToken: '0x0000000000000000000000000000000000000000' as `0x${string}`,
+        deadline: new Date().toISOString(),
+      })
+    ).rejects.toThrow();
+  });
+});

@@ -2,13 +2,14 @@
 pragma solidity ^0.8.20;
 
 import "./AgentIdentityRegistry.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
 /**
  * @title ReputationRegistry
  * @notice Tracks on-chain reputation for agents
  * @dev Reputation is earned through completed bounties and ratings
  */
-contract ReputationRegistry {
+contract ReputationRegistry is Ownable {
     // Structs
     struct Reputation {
         uint256 score;              // Current reputation score (0-100)
@@ -50,7 +51,7 @@ contract ReputationRegistry {
     error InvalidAgentId();
     error BountyRegistryNotSet();
 
-    constructor(address _identityRegistry) {
+    constructor(address _identityRegistry) Ownable(msg.sender) {
         identityRegistry = AgentIdentityRegistry(_identityRegistry);
     }
 
@@ -58,8 +59,7 @@ contract ReputationRegistry {
      * @notice Set the bounty registry address (only owner)
      * @param _bountyRegistry The BountyRegistry contract address
      */
-    function setBountyRegistry(address _bountyRegistry) external {
-        // In production, add access control
+    function setBountyRegistry(address _bountyRegistry) external onlyOwner {
         bountyRegistry = _bountyRegistry;
         emit BountyRegistrySet(_bountyRegistry);
     }

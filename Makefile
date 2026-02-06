@@ -30,7 +30,14 @@ help:
 	@echo ""
 	@echo "🧪 Local Development:"
 	@echo "  make dev             - Start local blockchain + deploy"
+	@echo "  make dev-full        - Full setup (docker + backend)"
+	@echo "  make docker-dev      - Docker with local hardhat node"
 	@echo "  make api             - Start API server"
+	@echo "  make indexer         - Start Event Indexer"
+	@echo "  make backend-install - Install backend dependencies"
+	@echo "  make sdk-install     - Install SDK dependencies"
+	@echo "  make sdk-build       - Build SDK"
+	@echo "  make integration-test - Run E2E tests"
 	@echo ""
 
 # Setup
@@ -55,7 +62,8 @@ clean:
 	@echo "🧹 Cleaning artifacts..."
 	bun run clean
 	rm -rf node_modules
-	rm -rf api/node_modules
+	rm -rf backend/node_modules
+	rm -rf sdk/node_modules
 
 # Deployment
 deploy:
@@ -111,7 +119,41 @@ dev: deploy-local seed
 
 api:
 	@echo "🚀 Starting API server..."
-	bun run api:dev
+	cd backend && bun run dev
+
+indexer:
+	@echo "🔄 Starting Event Indexer..."
+	cd backend && bun run indexer
+
+backend-install:
+	@echo "📦 Installing backend dependencies..."
+	cd backend && bun install
+
+sdk-install:
+	@echo "📦 Installing SDK dependencies..."
+	cd sdk && bun install
+
+sdk-build:
+	@echo "🔨 Building SDK..."
+	cd sdk && bun run build
+
+# Full local development setup
+dev-full: docker-up backend-install
+	@echo "⏳ Waiting for services to be healthy..."
+	sleep 5
+	@echo "🚀 Starting API in dev mode..."
+	cd backend && bun run dev
+
+# Docker with hardhat for local blockchain
+docker-dev:
+	@echo "🐳 Starting Docker services with local blockchain..."
+	docker-compose --profile dev up -d
+	@echo "✅ Services started including hardhat node on port 8545"
+
+# Integration test
+integration-test:
+	@echo "🧪 Running integration tests..."
+	bun test test/integration/
 
 # CI/CD
 ci-test:

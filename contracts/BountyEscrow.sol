@@ -64,7 +64,10 @@ contract BountyEscrow is ReentrancyGuard {
     
     /// @dev Track total value locked per token
     mapping(address => uint256) private _totalLocked;
-    
+
+    /// @dev Original deployer (can call initialize)
+    address private immutable _deployer;
+
     // ============ Events ============
     
     /**
@@ -146,6 +149,7 @@ contract BountyEscrow is ReentrancyGuard {
     constructor(address _identityRegistry) {
         require(_identityRegistry != address(0), "Invalid identity registry");
         identityRegistry = AgentIdentityRegistry(_identityRegistry);
+        _deployer = msg.sender;
     }
     
     /**
@@ -156,11 +160,12 @@ contract BountyEscrow is ReentrancyGuard {
      * @param _feeRate Fee rate in basis points
      */
     function initialize(
-        address _bountyRegistry, 
+        address _bountyRegistry,
         address _disputeResolver,
         address _feeRecipient,
         uint256 _feeRate
     ) external {
+        require(msg.sender == _deployer, "Only deployer");
         require(bountyRegistry == address(0), "Already initialized");
         require(_bountyRegistry != address(0), "Invalid bounty registry");
         require(_disputeResolver != address(0), "Invalid dispute resolver");
@@ -180,10 +185,11 @@ contract BountyEscrow is ReentrancyGuard {
      * @param bountyId The bounty ID
      * @param token ERC20 token address
      * @param amount Amount to escrow
+     * @param depositor The address of the depositor
      */
-    function deposit(uint256 bountyId, address token, uint256 amount) 
-        external 
-        onlyBountyRegistry 
+    function deposit(uint256 bountyId, address token, uint256 amount, address depositor)
+        external
+        onlyBountyRegistry
     {
         require(_escrows[bountyId].status == EscrowStatus.None, "Escrow already exists");
         require(amount > 0, "Amount must be positive");
@@ -191,16 +197,16 @@ contract BountyEscrow is ReentrancyGuard {
         _escrows[bountyId] = EscrowInfo({
             token: token,
             amount: amount,
-            depositor: tx.origin,
+            depositor: depositor,
             hunterAgentId: 0,
             status: EscrowStatus.Locked,
             createdAt: block.timestamp,
             releasedAt: 0
         });
-        
+
         _totalLocked[token] += amount;
-        
-        emit Deposited(bountyId, token, amount, tx.origin);
+
+        emit Deposited(bountyId, token, amount, depositor);
     }
     
     /**

@@ -20,7 +20,7 @@ FROM base AS dependencies
 
 # Copy package files
 COPY package.json bun.lockb ./
-COPY api/package.json ./api/
+COPY backend/package.json ./backend/
 
 # Install all dependencies (including dev)
 RUN bun install --frozen-lockfile
@@ -34,7 +34,7 @@ FROM dependencies AS build
 COPY . .
 
 # Build TypeScript
-WORKDIR /app/api
+WORKDIR /app/backend
 RUN bun run build
 
 # ============================================
@@ -43,7 +43,7 @@ RUN bun run build
 FROM base AS prod-dependencies
 
 COPY package.json bun.lockb ./
-COPY api/package.json ./api/
+COPY backend/package.json ./backend/
 
 # Install only production dependencies
 RUN bun install --production --frozen-lockfile
@@ -64,11 +64,11 @@ RUN addgroup --system --gid 1001 nodejs && \
 
 # Copy production dependencies
 COPY --from=prod-dependencies --chown=bun:nodejs /app/node_modules ./node_modules
-COPY --from=prod-dependencies --chown=bun:nodejs /app/api/node_modules ./api/node_modules
+COPY --from=prod-dependencies --chown=bun:nodejs /app/backend/node_modules ./backend/node_modules
 
 # Copy built application
-COPY --from=build --chown=bun:nodejs /app/api/dist ./api/dist
-COPY --from=build --chown=bun:nodejs /app/api/package.json ./api/
+COPY --from=build --chown=bun:nodejs /app/backend/dist ./backend/dist
+COPY --from=build --chown=bun:nodejs /app/backend/package.json ./backend/
 COPY --from=build --chown=bun:nodejs /app/deployments ./deployments
 
 # Create logs directory
@@ -85,8 +85,10 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
 EXPOSE 3000
 
 # Start command
-WORKDIR /app/api
+WORKDIR /app/backend
 CMD ["bun", "run", "start"]
+
+# For indexer: bun run src/indexer/index.ts
 
 # ============================================
 # Stage 6: Development
@@ -101,7 +103,7 @@ RUN bun add -g nodemon
 # Copy all source code
 COPY . .
 
-WORKDIR /app/api
+WORKDIR /app/backend
 
 EXPOSE 3000
 

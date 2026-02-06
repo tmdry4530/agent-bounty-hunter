@@ -1,6 +1,7 @@
-import { Response, NextFunction } from 'express';
+import { createMiddleware } from 'hono/factory';
+import { Context } from 'hono';
 import { ethers } from 'ethers';
-import { AuthenticatedRequest, ErrorCode, PaymentRequirement, X402Payment } from '../types';
+import type { ErrorCode, PaymentRequirement, X402Payment } from '../types';
 import { getERC20Contract } from '../contracts';
 
 /**
@@ -12,6 +13,15 @@ export const X402_PRICING = {
   CLAIM_BOUNTY: '0.001',        // 0.001 USDC
   GET_BOUNTY_DETAILS: '0.001',  // 0.001 USDC
 } as const;
+
+/**
+ * Extended context type with payment
+ */
+export type PaymentContext = {
+  Variables: {
+    payment?: X402Payment;
+  };
+};
 
 /**
  * Create payment requirement response
@@ -27,7 +37,7 @@ function createPaymentRequirement(
     token: 'USDC',
     tokenAddress: process.env.USDC_TOKEN_ADDRESS!,
     network: 'monad',
-    chainId: parseInt(process.env.CHAIN_ID || '41454'),
+    chainId: parseInt(process.env.CHAIN_ID || '143'),
     recipient: process.env.PLATFORM_WALLET_ADDRESS!,
     memo,
     expiresAt
@@ -44,7 +54,7 @@ async function verifyPaymentProof(
 ): Promise<boolean> {
   try {
     const provider = new ethers.JsonRpcProvider(process.env.MONAD_RPC_URL);
-    
+
     // Verify transaction exists and is confirmed
     const tx = await provider.getTransaction(payment.txHash);
     if (!tx) {
@@ -79,7 +89,7 @@ async function verifyPaymentProof(
     // Verify amount (convert to wei for comparison)
     const requiredAmountWei = ethers.parseUnits(requiredAmount, 6); // USDC has 6 decimals
     const paidAmountWei = BigInt(payment.amount);
-    
+
     if (paidAmountWei < requiredAmountWei) {
       console.error('Insufficient payment amount');
       return false;
@@ -130,33 +140,35 @@ async function verifyPaymentProof(
 }
 
 /**
- * x402 middleware factory
+ * x402 middleware factory for Hono
  * @param amount - Required payment amount in USDC
  * @param memo - Payment memo/description
  */
 export function requirePayment(amount: string, memo: string) {
-  return async (
-    req: AuthenticatedRequest,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  return createMiddleware<PaymentContext>(async (c, next) => {
+    // Development bypass
+    if (process.env.X402_DEV_BYPASS === 'true') {
+      console.warn('[X402] ⚠️  X402_DEV_BYPASS enabled - skipping payment verification');
+      await next();
+      return;
+    }
+
     try {
       // Check for X-Payment header
-      const paymentHeader = req.headers['x-payment'] as string;
+      const paymentHeader = c.req.header('x-payment');
 
       if (!paymentHeader) {
         // No payment provided - return 402 with payment requirements
         const payment = createPaymentRequirement(amount, memo);
-        
-        res.status(402).json({
+
+        return c.json({
           success: false,
           error: {
-            code: ErrorCode.PAYMENT_REQUIRED,
+            code: 'PAYMENT_REQUIRED' as ErrorCode,
             message: 'Payment required to access this endpoint'
           },
           payment
-        });
-        return;
+        }, 402);
       }
 
       // Decode payment proof
@@ -165,14 +177,13 @@ export function requirePayment(amount: string, memo: string) {
         const decoded = Buffer.from(paymentHeader, 'base64').toString('utf-8');
         payment = JSON.parse(decoded);
       } catch (error) {
-        res.status(400).json({
+        return c.json({
           success: false,
           error: {
-            code: ErrorCode.PAYMENT_INVALID,
+            code: 'PAYMENT_INVALID' as ErrorCode,
             message: 'Invalid payment proof format'
           }
-        });
-        return;
+        }, 400);
       }
 
       // Verify payment
@@ -183,31 +194,30 @@ export function requirePayment(amount: string, memo: string) {
       );
 
       if (!isValid) {
-        res.status(400).json({
+        return c.json({
           success: false,
           error: {
-            code: ErrorCode.PAYMENT_INVALID,
+            code: 'PAYMENT_INVALID' as ErrorCode,
             message: 'Payment verification failed'
           }
-        });
-        return;
+        }, 400);
       }
 
-      // Attach payment to request
-      req.payment = payment;
+      // Attach payment to context
+      c.set('payment', payment);
 
-      next();
+      await next();
     } catch (error) {
       console.error('x402 middleware error:', error);
-      res.status(500).json({
+      return c.json({
         success: false,
         error: {
-          code: ErrorCode.INTERNAL_ERROR,
+          code: 'INTERNAL_ERROR' as ErrorCode,
           message: 'Payment processing failed'
         }
-      });
+      }, 500);
     }
-  };
+  });
 }
 
 /**

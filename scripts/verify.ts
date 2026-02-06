@@ -41,7 +41,7 @@ async function main() {
     try {
       await run("verify:verify", {
         address: deployment.contracts.AgentIdentityRegistry,
-        constructorArguments: [],
+        constructorArguments: [0], // 0 wei registration fee
       });
       console.log(`   ✅ AgentIdentityRegistry verified`);
     } catch (error: any) {
@@ -77,7 +77,7 @@ async function main() {
     try {
       await run("verify:verify", {
         address: deployment.contracts.BountyEscrow,
-        constructorArguments: [],
+        constructorArguments: [deployment.contracts.AgentIdentityRegistry],
       });
       console.log(`   ✅ BountyEscrow verified`);
     } catch (error: any) {
@@ -139,8 +139,8 @@ function printExplorerLinks(deployment: DeploymentData) {
   
   // Determine explorer URL based on network
   switch (deployment.chainId) {
-    case 41454: // Monad Testnet
-      explorerUrl = "https://explorer.testnet.monad.xyz";
+    case 10143: // Monad Testnet
+      explorerUrl = "https://testnet.monadexplorer.com";
       break;
     case 80001: // Polygon Mumbai
       explorerUrl = "https://mumbai.polygonscan.com";

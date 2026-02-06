@@ -4,8 +4,6 @@
     "module": "ES2022",
     "moduleResolution": "bundler",
     "lib": ["ES2022"],
-    "types": ["bun-types"],
-    
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,

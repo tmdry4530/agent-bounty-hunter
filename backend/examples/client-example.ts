@@ -17,7 +17,7 @@ const MONAD_RPC = process.env.MONAD_RPC_URL || 'https://rpc.monad.xyz';
 const EIP712_DOMAIN = {
   name: 'AgentBountyHunter',
   version: '1',
-  chainId: 41454,
+  chainId: 143,
   verifyingContract: '0x...' // Your contract address
 };
 

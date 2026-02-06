@@ -47,7 +47,7 @@ export async function deploySystem(): Promise<SystemFixture> {
 
   // Deploy Escrow
   const EscrowFactory = await ethers.getContractFactory("BountyEscrow");
-  const escrow = await EscrowFactory.deploy();
+  const escrow = await EscrowFactory.deploy(await identityRegistry.getAddress());
   await escrow.waitForDeployment();
 
   // Deploy Bounty Registry
@@ -55,13 +55,18 @@ export async function deploySystem(): Promise<SystemFixture> {
   const bountyRegistry = await BountyFactory.deploy(
     await identityRegistry.getAddress(),
     await reputationRegistry.getAddress(),
-    await escrow.getAddress(),
-    feeRecipient.address
+    await escrow.getAddress()
   );
   await bountyRegistry.waitForDeployment();
 
   // Initialize
-  await escrow.initialize(await bountyRegistry.getAddress(), owner.address);
+  const feeRate = 250; // 2.5% fee
+  await escrow.initialize(
+    await bountyRegistry.getAddress(),
+    owner.address,
+    feeRecipient.address,
+    feeRate
+  );
   await reputationRegistry.setBountyRegistry(await bountyRegistry.getAddress());
 
   return {

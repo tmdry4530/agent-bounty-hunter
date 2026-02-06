@@ -1,0 +1,216 @@
+{
+  "version": "1.0.0",
+  "lastScanned": 1770301689293,
+  "projectRoot": "/mnt/d/Develop/agent-bounty-hunter",
+  "techStack": {
+    "languages": [
+      {
+        "name": "JavaScript/TypeScript",
+        "version": null,
+        "confidence": "high",
+        "markers": [
+          "package.json"
+        ]
+      },
+      {
+        "name": "TypeScript",
+        "version": null,
+        "confidence": "high",
+        "markers": [
+          "tsconfig.json"
+        ]
+      },
+      {
+        "name": "C/C++",
+        "version": null,
+        "confidence": "high",
+        "markers": [
+          "Makefile"
+        ]
+      }
+    ],
+    "frameworks": [],
+    "packageManager": "npm",
+    "runtime": null
+  },
+  "build": {
+    "buildCommand": "make build",
+    "testCommand": "npm test",
+    "lintCommand": null,
+    "devCommand": null,
+    "scripts": {
+      "compile": "hardhat compile",
+      "test": "hardhat test",
+      "deploy": "hardhat run scripts/deploy.ts",
+      "deploy:monad": "hardhat run scripts/deploy.ts --network monad",
+      "deploy:mumbai": "hardhat run scripts/deploy.ts --network mumbai",
+      "deploy:local": "hardhat run scripts/deploy.ts --network localhost",
+      "verify": "hardhat run scripts/verify.ts",
+      "seed": "hardhat run scripts/seed.ts",
+      "node": "hardhat node",
+      "clean": "hardhat clean",
+      "coverage": "hardhat coverage",
+      "docker:up": "docker-compose up -d",
+      "docker:down": "docker-compose down",
+      "docker:logs": "docker-compose logs -f",
+      "api:dev": "cd api && bun run dev",
+      "api:build": "cd api && bun run build",
+      "api:start": "cd api && bun run start"
+    }
+  },
+  "conventions": {
+    "namingStyle": null,
+    "importStyle": null,
+    "testPattern": "*.test.ts",
+    "fileOrganization": null
+  },
+  "structure": {
+    "isMonorepo": false,
+    "workspaces": [],
+    "mainDirectories": [
+      "docs",
+      "scripts",
+      "test"
+    ],
+    "gitBranches": {
+      "defaultBranch": "main",
+      "branchingStrategy": null
+    }
+  },
+  "customNotes": [],
+  "directoryMap": {
+    "api": {
+      "path": "api",
+      "purpose": "API routes",
+      "fileCount": 1,
+      "lastAccessed": 1770301689235,
+      "keyFiles": [
+        "package.json"
+      ]
+    },
+    "backend": {
+      "path": "backend",
+      "purpose": null,
+      "fileCount": 8,
+      "lastAccessed": 1770301689239,
+      "keyFiles": [
+        "BACKEND_COMPLETE.md",
+        "BUILD_SUMMARY.md",
+        "DEPLOYMENT.md",
+        "README.md",
+        "package.json"
+      ]
+    },
+    "contracts": {
+      "path": "contracts",
+      "purpose": null,
+      "fileCount": 5,
+      "lastAccessed": 1770301689243,
+      "keyFiles": [
+        "AgentIdentityRegistry.sol",
+        "BountyEscrow.sol",
+        "BountyRegistry.sol",
+        "README.md",
+        "ReputationRegistry.sol"
+      ]
+    },
+    "demo": {
+      "path": "demo",
+      "purpose": null,
+      "fileCount": 10,
+      "lastAccessed": 1770301689247,
+      "keyFiles": [
+        "ARCHITECTURE.md",
+        "DELIVERABLES.md",
+        "QUICK_START.md",
+        "README.md",
+        "demo.ts"
+      ]
+    },
+    "deployments": {
+      "path": "deployments",
+      "purpose": null,
+      "fileCount": 1,
+      "lastAccessed": 1770301689252,
+      "keyFiles": []
+    },
+    "docs": {
+      "path": "docs",
+      "purpose": "Documentation",
+      "fileCount": 9,
+      "lastAccessed": 1770301689255,
+      "keyFiles": [
+        "API_SPEC.md",
+        "ARCHITECTURE.md",
+        "DATA_MODEL.md",
+        "ROADMAP.md",
+        "SMART_CONTRACTS.md"
+      ]
+    },
+    "scripts": {
+      "path": "scripts",
+      "purpose": "Build/utility scripts",
+      "fileCount": 6,
+      "lastAccessed": 1770301689259,
+      "keyFiles": [
+        "check-balance.ts",
+        "check-network.sh",
+        "deploy.js",
+        "deploy.ts",
+        "seed.ts"
+      ]
+    },
+    "test": {
+      "path": "test",
+      "purpose": "Test files",
+      "fileCount": 8,
+      "lastAccessed": 1770301689263,
+      "keyFiles": [
+        "AgentIdentityRegistry.test.cjs",
+        "AgentIdentityRegistry.test.ts",
+        "BountyEscrow.test.cjs",
+        "BountyEscrow.test.ts",
+        "BountyRegistry.test.cjs"
+      ]
+    },
+    "backend/examples": {
+      "path": "backend/examples",
+      "purpose": "Example code",
+      "fileCount": 1,
+      "lastAccessed": 1770301689270,
+      "keyFiles": [
+        "client-example.ts"
+      ]
+    },
+    "backend/src": {
+      "path": "backend/src",
+      "purpose": "Source code",
+      "fileCount": 1,
+      "lastAccessed": 1770301689273,
+      "keyFiles": [
+        "server.ts"
+      ]
+    },
+    "contracts/mocks": {
+      "path": "contracts/mocks",
+      "purpose": "Mock data",
+      "fileCount": 1,
+      "lastAccessed": 1770301689280,
+      "keyFiles": [
+        "MockERC20.sol"
+      ]
+    },
+    "test/helpers": {
+      "path": "test/helpers",
+      "purpose": "Helper functions",
+      "fileCount": 2,
+      "lastAccessed": 1770301689293,
+      "keyFiles": [
+        "fixtures.ts",
+        "utils.ts"
+      ]
+    }
+  },
+  "hotPaths": [],
+  "userDirectives": []
+}

@@ -57,7 +57,7 @@ async function main() {
     // ============ 1. Deploy AgentIdentityRegistry ============
     console.log("📝 [1/4] Deploying AgentIdentityRegistry...");
     const AgentIdentityRegistry = await ethers.getContractFactory("AgentIdentityRegistry");
-    const identityRegistry = await AgentIdentityRegistry.deploy();
+    const identityRegistry = await AgentIdentityRegistry.deploy(0); // 0 wei registration fee for testing
     await identityRegistry.waitForDeployment();
     const identityAddress = await identityRegistry.getAddress();
     deploymentData.contracts.AgentIdentityRegistry = identityAddress;
@@ -88,7 +88,7 @@ async function main() {
     // ============ 3. Deploy BountyEscrow ============
     console.log("📝 [3/4] Deploying BountyEscrow...");
     const BountyEscrow = await ethers.getContractFactory("BountyEscrow");
-    const bountyEscrow = await BountyEscrow.deploy();
+    const bountyEscrow = await BountyEscrow.deploy(identityAddress);
     await bountyEscrow.waitForDeployment();
     const escrowAddress = await bountyEscrow.getAddress();
     deploymentData.contracts.BountyEscrow = escrowAddress;
@@ -121,16 +121,21 @@ async function main() {
 
     // ============ 5. Setup Permissions ============
     console.log("🔐 Setting up permissions...");
-    
+
     // Set BountyRegistry as authorized caller for ReputationRegistry
-    const tx1 = await reputationRegistry.setAuthorizedCaller(bountyAddress, true);
+    const tx1 = await reputationRegistry.setBountyRegistry(bountyAddress);
     await tx1.wait();
-    console.log(`   ✅ BountyRegistry authorized on ReputationRegistry`);
+    console.log(`   ✅ BountyRegistry set on ReputationRegistry`);
     
-    // Set BountyRegistry as authorized caller for BountyEscrow
-    const tx2 = await bountyEscrow.setAuthorizedRegistry(bountyAddress);
+    // Initialize BountyEscrow with configuration
+    const tx2 = await bountyEscrow.initialize(
+      bountyAddress,           // _bountyRegistry
+      deployer.address,        // _disputeResolver (deployer for now)
+      deployer.address,        // _feeRecipient (deployer for now)
+      100                      // _feeRate (1% = 100 basis points)
+    );
     await tx2.wait();
-    console.log(`   ✅ BountyRegistry authorized on BountyEscrow`);
+    console.log(`   ✅ BountyEscrow initialized with BountyRegistry`);
     console.log();
 
     // ============ 6. Save Deployment Info ============
@@ -155,12 +160,10 @@ async function main() {
   }
 }
 
-// Helper: Wait for N blocks
+// Helper: Wait for N seconds (for testnet block propagation)
 async function waitForBlocks(n: number) {
-  console.log(`   ⏳ Waiting for ${n} blocks...`);
-  for (let i = 0; i < n; i++) {
-    await ethers.provider.send("evm_mine", []);
-  }
+  console.log(`   ⏳ Waiting ${n * 2} seconds for block confirmation...`);
+  await new Promise(resolve => setTimeout(resolve, n * 2000));
 }
 
 // Helper: Save deployment info to JSON

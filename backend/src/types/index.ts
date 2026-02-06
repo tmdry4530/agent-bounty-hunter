@@ -1,5 +1,3 @@
-import { Request } from 'express';
-
 // ============================================
 // Authentication
 // ============================================
@@ -10,7 +8,7 @@ export interface AuthHeaders {
   'x-signature': string;
 }
 
-export interface AuthenticatedRequest extends Request {
+export interface AuthenticatedRequest {
   agent?: {
     agentId: bigint;
     address: string;

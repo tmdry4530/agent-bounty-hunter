@@ -1,0 +1,91 @@
+{
+  "version": "1.0.0",
+  "lastScanned": 1770353155548,
+  "projectRoot": "/mnt/d/Develop/agent-bounty-hunter/demo",
+  "techStack": {
+    "languages": [
+      {
+        "name": "JavaScript/TypeScript",
+        "version": null,
+        "confidence": "high",
+        "markers": [
+          "package.json"
+        ]
+      },
+      {
+        "name": "TypeScript",
+        "version": null,
+        "confidence": "high",
+        "markers": [
+          "tsconfig.json"
+        ]
+      }
+    ],
+    "frameworks": [],
+    "packageManager": "npm",
+    "runtime": null
+  },
+  "build": {
+    "buildCommand": null,
+    "testCommand": null,
+    "lintCommand": null,
+    "devCommand": null,
+    "scripts": {
+      "demo": "bun run demo.ts",
+      "demo:quick": "bun run demo.ts --quick",
+      "demo:verbose": "bun run demo.ts --verbose",
+      "demo:scenario": "bun run demo-scenario.ts"
+    }
+  },
+  "conventions": {
+    "namingStyle": null,
+    "importStyle": null,
+    "testPattern": null,
+    "fileOrganization": null
+  },
+  "structure": {
+    "isMonorepo": false,
+    "workspaces": [],
+    "mainDirectories": [],
+    "gitBranches": {
+      "defaultBranch": "main",
+      "branchingStrategy": null
+    }
+  },
+  "customNotes": [],
+  "directoryMap": {
+    "agents": {
+      "path": "agents",
+      "purpose": null,
+      "fileCount": 2,
+      "lastAccessed": 1770353155513,
+      "keyFiles": [
+        "CreatorAgent.ts",
+        "HunterAgent.ts"
+      ]
+    },
+    "scenarios": {
+      "path": "scenarios",
+      "purpose": null,
+      "fileCount": 4,
+      "lastAccessed": 1770353155517,
+      "keyFiles": [
+        "data-analysis.ts",
+        "frontend-task.ts",
+        "index.ts",
+        "security-audit.ts"
+      ]
+    },
+    "sdk": {
+      "path": "sdk",
+      "purpose": null,
+      "fileCount": 1,
+      "lastAccessed": 1770353155521,
+      "keyFiles": [
+        "BountyHunterClient.ts"
+      ]
+    }
+  },
+  "hotPaths": [],
+  "userDirectives": []
+}

@@ -15,7 +15,7 @@ services:
       - "${POSTGRES_PORT:-5432}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./api/database/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+      - ./backend/database/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
@@ -68,20 +68,22 @@ services:
       # Redis
       REDIS_URL: redis://redis:6379
       REDIS_PASSWORD: ${REDIS_PASSWORD:-}
-      
+
       # Blockchain
       AGENT_IDENTITY_REGISTRY: ${AGENT_IDENTITY_REGISTRY}
       REPUTATION_REGISTRY: ${REPUTATION_REGISTRY}
       BOUNTY_REGISTRY: ${BOUNTY_REGISTRY}
       BOUNTY_ESCROW: ${BOUNTY_ESCROW}
       MONAD_RPC: ${MONAD_RPC}
-      
+      RPC_URL: ${MONAD_RPC}
+
       # Security
       JWT_SECRET: ${JWT_SECRET}
       ADMIN_API_KEY: ${ADMIN_API_KEY}
       
       # x402
       X402_ENABLED: ${X402_ENABLED:-true}
+      X402_DEV_BYPASS: ${X402_DEV_BYPASS:-true}
       X402_PAYMENT_ADDRESS: ${X402_PAYMENT_ADDRESS}
       
       # IPFS
@@ -94,7 +96,7 @@ services:
     ports:
       - "${API_PORT:-3000}:3000"
     volumes:
-      - ./api/logs:/app/logs
+      - ./backend/logs:/app/logs
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
       interval: 30s
@@ -127,23 +129,39 @@ services:
       # Redis
       REDIS_URL: redis://redis:6379
       REDIS_PASSWORD: ${REDIS_PASSWORD:-}
-      
+
       # Blockchain
       AGENT_IDENTITY_REGISTRY: ${AGENT_IDENTITY_REGISTRY}
       REPUTATION_REGISTRY: ${REPUTATION_REGISTRY}
       BOUNTY_REGISTRY: ${BOUNTY_REGISTRY}
       BOUNTY_ESCROW: ${BOUNTY_ESCROW}
       MONAD_RPC: ${MONAD_RPC}
-      
+      RPC_URL: ${MONAD_RPC}
+
       # Indexer config
       INDEXER_START_BLOCK: ${INDEXER_START_BLOCK:-0}
       INDEXER_BATCH_SIZE: ${INDEXER_BATCH_SIZE:-1000}
       INDEXER_POLL_INTERVAL: ${INDEXER_POLL_INTERVAL:-10000}
       
       LOG_LEVEL: ${LOG_LEVEL:-info}
-    command: bun run indexer
+    command: bun run src/indexer/index.ts
     volumes:
-      - ./api/logs:/app/logs
+      - ./backend/logs:/app/logs
+    networks:
+      - abh-network
+
+  # Hardhat local node (for development)
+  hardhat:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    container_name: abh-hardhat
+    profiles:
+      - dev
+    command: npx hardhat node
+    ports:
+      - "8545:8545"
     networks:
       - abh-network
 

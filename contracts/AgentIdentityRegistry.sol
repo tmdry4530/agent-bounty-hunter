@@ -2,6 +2,7 @@
 pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "@openzeppelin/contracts/utils/cryptography/EIP712.sol";
@@ -11,7 +12,7 @@ import "@openzeppelin/contracts/utils/cryptography/EIP712.sol";
  * @notice ERC-8004 compliant agent identity registry with ERC-721 NFT representation
  * @dev Each agent gets a unique NFT representing their on-chain identity
  */
-contract AgentIdentityRegistry is ERC721, Ownable, EIP712 {
+contract AgentIdentityRegistry is ERC721Enumerable, Ownable, EIP712 {
     using ECDSA for bytes32;
 
     // State variables
@@ -103,7 +104,7 @@ contract AgentIdentityRegistry is ERC721, Ownable, EIP712 {
         view 
         returns (bytes memory) 
     {
-        if (!_ownerOf(agentId) == address(0)) revert InvalidAgentId();
+        if (_ownerOf(agentId) == address(0)) revert InvalidAgentId();
         return _metadata[agentId][key];
     }
 
@@ -210,6 +211,31 @@ contract AgentIdentityRegistry is ERC721, Ownable, EIP712 {
      */
     function withdraw() external onlyOwner {
         payable(owner()).transfer(address(this).balance);
+    }
+
+    // Required overrides for ERC721Enumerable
+    function _update(address to, uint256 tokenId, address auth)
+        internal
+        override(ERC721Enumerable)
+        returns (address)
+    {
+        return super._update(to, tokenId, auth);
+    }
+
+    function _increaseBalance(address account, uint128 amount)
+        internal
+        override(ERC721Enumerable)
+    {
+        super._increaseBalance(account, amount);
+    }
+
+    function supportsInterface(bytes4 interfaceId)
+        public
+        view
+        override(ERC721Enumerable)
+        returns (bool)
+    {
+        return super.supportsInterface(interfaceId);
     }
 }
 

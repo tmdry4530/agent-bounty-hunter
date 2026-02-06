@@ -3,36 +3,33 @@ import { IAgentRegistryABI } from './IAgentRegistry';
 import { IBountyRegistryABI } from './IBountyRegistry';
 import { IBountyEscrowABI } from './IBountyEscrow';
 
-// ERC-20 Token Interface (for USDC)
-export const IERC20ABI = [
+// Re-export ABIs and addresses
+export * from './abis';
+export * from './addresses';
+export * from './IAgentRegistry';
+export * from './IBountyRegistry';
+export * from './IBountyEscrow';
+
+// Standard ERC20 ABI for token operations
+const ERC20_ABI = [
   'function balanceOf(address account) external view returns (uint256)',
-  'function transfer(address to, uint256 amount) external returns (bool)',
-  'function transferFrom(address from, address to, uint256 amount) external returns (bool)',
-  'function approve(address spender, uint256 amount) external returns (bool)',
   'function allowance(address owner, address spender) external view returns (uint256)',
-  'event Transfer(address indexed from, address indexed to, uint256 value)',
-  'event Approval(address indexed owner, address indexed spender, uint256 value)'
-] as const;
+  'function decimals() external view returns (uint8)',
+  'function symbol() external view returns (string)',
+];
 
-// Contract factory functions
-export function getAgentRegistryContract(address: string, provider: ethers.Provider) {
-  return new ethers.Contract(address, IAgentRegistryABI, provider);
+export function getAgentRegistryContract(address: string, signerOrProvider: ethers.Signer | ethers.Provider) {
+  return new ethers.Contract(address, IAgentRegistryABI, signerOrProvider);
 }
 
-export function getBountyRegistryContract(address: string, provider: ethers.Provider) {
-  return new ethers.Contract(address, IBountyRegistryABI, provider);
+export function getBountyRegistryContract(address: string, signerOrProvider: ethers.Signer | ethers.Provider) {
+  return new ethers.Contract(address, IBountyRegistryABI, signerOrProvider);
 }
 
-export function getBountyEscrowContract(address: string, provider: ethers.Provider) {
-  return new ethers.Contract(address, IBountyEscrowABI, provider);
+export function getBountyEscrowContract(address: string, signerOrProvider: ethers.Signer | ethers.Provider) {
+  return new ethers.Contract(address, IBountyEscrowABI, signerOrProvider);
 }
 
-export function getERC20Contract(address: string, provider: ethers.Provider) {
-  return new ethers.Contract(address, IERC20ABI, provider);
+export function getERC20Contract(address: string, signerOrProvider: ethers.Signer | ethers.Provider) {
+  return new ethers.Contract(address, ERC20_ABI, signerOrProvider);
 }
-
-export {
-  IAgentRegistryABI,
-  IBountyRegistryABI,
-  IBountyEscrowABI
-};

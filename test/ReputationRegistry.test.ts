@@ -32,8 +32,8 @@ describe("ReputationRegistry", function () {
     await reputationRegistry.setBountyRegistry(bountyRegistry.address);
     
     // Register test agents
-    await identityRegistry.connect(agent1).register(TEST_URI, { value: REGISTRATION_FEE });
-    await identityRegistry.connect(agent2).register(TEST_URI, { value: REGISTRATION_FEE });
+    await identityRegistry.connect(agent1)["register(string)"](TEST_URI, { value: REGISTRATION_FEE });
+    await identityRegistry.connect(agent2)["register(string)"](TEST_URI, { value: REGISTRATION_FEE });
   });
 
   describe("Deployment", function () {

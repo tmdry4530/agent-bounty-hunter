@@ -52,15 +52,18 @@ async function main() {
 
   try {
     // ============ 1. Register Test Agents ============
-    console.log("📝 [1/4] Registering test agents...");
-    
+    console.log("📝 [1/5] Registering test agents...");
+
+    // Get registration fee
+    const registrationFee = await identityRegistry.registrationFee();
+
     // Creator Agent
     const creatorURI = "ipfs://QmCreator123/metadata.json";
-    const tx1 = await identityRegistry.connect(creator).register(creatorURI);
+    const tx1 = await identityRegistry.connect(creator)["register(string)"](creatorURI, { value: registrationFee });
     await tx1.wait();
     const creatorAgentId = 1;
     console.log(`   ✅ Creator Agent registered (ID: ${creatorAgentId})`);
-    
+
     // Set creator metadata
     await identityRegistry.connect(creator).setMetadata(
       creatorAgentId,
@@ -75,11 +78,11 @@ async function main() {
 
     // Hunter 1 Agent
     const hunter1URI = "ipfs://QmHunter123/metadata.json";
-    const tx2 = await identityRegistry.connect(hunter1).register(hunter1URI);
+    const tx2 = await identityRegistry.connect(hunter1)["register(string)"](hunter1URI, { value: registrationFee });
     await tx2.wait();
     const hunter1AgentId = 2;
     console.log(`   ✅ Hunter1 Agent registered (ID: ${hunter1AgentId})`);
-    
+
     // Set hunter1 metadata
     await identityRegistry.connect(hunter1).setMetadata(
       hunter1AgentId,
@@ -94,11 +97,11 @@ async function main() {
 
     // Hunter 2 Agent
     const hunter2URI = "ipfs://QmHunter456/metadata.json";
-    const tx3 = await identityRegistry.connect(hunter2).register(hunter2URI);
+    const tx3 = await identityRegistry.connect(hunter2)["register(string)"](hunter2URI, { value: registrationFee });
     await tx3.wait();
     const hunter2AgentId = 3;
     console.log(`   ✅ Hunter2 Agent registered (ID: ${hunter2AgentId})`);
-    
+
     await identityRegistry.connect(hunter2).setMetadata(
       hunter2AgentId,
       "skills",
@@ -106,84 +109,105 @@ async function main() {
     );
     console.log();
 
-    // ============ 2. Create Test Bounties ============
-    console.log("📝 [2/4] Creating test bounties...");
-    
+    // ============ 2. Deploy Mock ERC20 Token ============
+    console.log("📝 [2/5] Deploying Mock USDC...");
+
+    const MockERC20 = await ethers.getContractFactory("MockERC20");
+    const mockUSDC = await MockERC20.deploy("Mock USDC", "USDC", 6);
+    await mockUSDC.waitForDeployment();
+    const usdcAddress = await mockUSDC.getAddress();
+    console.log(`   ✅ Mock USDC deployed at: ${usdcAddress}`);
+
+    // Mint tokens to creator
     const USDC_DECIMALS = 6;
+    const mintAmount = ethers.parseUnits("1000", USDC_DECIMALS);
+    await mockUSDC.mint(creator.address, mintAmount);
+    console.log(`   ✅ Minted 1000 USDC to creator`);
+
+    // Approve BountyRegistry to spend tokens
+    const bountyRegistryAddress = await bountyRegistry.getAddress();
+    await mockUSDC.connect(creator).approve(bountyRegistryAddress, ethers.MaxUint256);
+    console.log(`   ✅ Approved BountyRegistry to spend USDC`);
+    console.log();
+
+    // ============ 3. Create Test Bounties ============
+    console.log("📝 [3/5] Creating test bounties...");
+
     const reward1 = ethers.parseUnits("10", USDC_DECIMALS); // 10 USDC
     const reward2 = ethers.parseUnits("25", USDC_DECIMALS); // 25 USDC
-    
-    // Use zero address for native token (or deploy mock USDC for testnet)
-    const paymentToken = ethers.ZeroAddress;
-    
+
     // Bounty 1: Security Audit
-    const bounty1URI = "ipfs://QmBounty1/details.json";
-    const tx4 = await bountyRegistry.connect(creator).createBounty(
-      creatorAgentId,
-      bounty1URI,
-      paymentToken,
-      reward1,
-      Math.floor(Date.now() / 1000) + 86400 * 7, // 7 days deadline
-      ["solidity", "security-audit"],
-      { value: reward1 } // Send ETH as reward
-    );
+    const bountyParams1 = {
+      title: "Security Audit for Smart Contract",
+      descriptionURI: "ipfs://QmBounty1/details.json",
+      rewardToken: usdcAddress,
+      rewardAmount: reward1,
+      deadline: Math.floor(Date.now() / 1000) + 86400 * 7, // 7 days
+      minReputation: 0,
+      requiredSkills: ["solidity", "security-audit"]
+    };
+
+    const tx4 = await bountyRegistry.connect(creator).createBounty(bountyParams1);
     await tx4.wait();
     const bounty1Id = 1;
     console.log(`   ✅ Bounty #${bounty1Id} created: Security Audit (10 USDC)`);
 
     // Bounty 2: API Development
-    const bounty2URI = "ipfs://QmBounty2/details.json";
-    const tx5 = await bountyRegistry.connect(creator).createBounty(
-      creatorAgentId,
-      bounty2URI,
-      paymentToken,
-      reward2,
-      Math.floor(Date.now() / 1000) + 86400 * 14, // 14 days deadline
-      ["typescript", "api-development"],
-      { value: reward2 }
-    );
+    const bountyParams2 = {
+      title: "REST API Development",
+      descriptionURI: "ipfs://QmBounty2/details.json",
+      rewardToken: usdcAddress,
+      rewardAmount: reward2,
+      deadline: Math.floor(Date.now() / 1000) + 86400 * 14, // 14 days
+      minReputation: 0,
+      requiredSkills: ["typescript", "api-development"]
+    };
+
+    const tx5 = await bountyRegistry.connect(creator).createBounty(bountyParams2);
     await tx5.wait();
     const bounty2Id = 2;
     console.log(`   ✅ Bounty #${bounty2Id} created: API Development (25 USDC)`);
     console.log();
 
-    // ============ 3. Claim and Submit Bounty ============
-    console.log("📝 [3/4] Simulating bounty workflow...");
-    
+    // ============ 4. Claim and Submit Bounty ============
+    console.log("📝 [4/5] Simulating bounty workflow...");
+
     // Hunter1 claims Bounty #1
-    const tx6 = await bountyRegistry.connect(hunter1).claimBounty(bounty1Id, hunter1AgentId);
+    const tx6 = await bountyRegistry.connect(hunter1).claimBounty(bounty1Id);
     await tx6.wait();
     console.log(`   ✅ Bounty #${bounty1Id} claimed by Hunter1`);
-    
+
     // Hunter1 submits work
     const submissionURI = "ipfs://QmSubmission1/report.json";
-    const tx7 = await bountyRegistry.connect(hunter1).submitWork(bounty1Id, hunter1AgentId, submissionURI);
+    const tx7 = await bountyRegistry.connect(hunter1).submitWork(bounty1Id, submissionURI);
     await tx7.wait();
     console.log(`   ✅ Hunter1 submitted work for Bounty #${bounty1Id}`);
-    
-    // Creator approves and pays
-    const tx8 = await bountyRegistry.connect(creator).approveBounty(bounty1Id, creatorAgentId);
+
+    // Creator approves and pays (with rating and feedback)
+    const tx8 = await bountyRegistry.connect(creator).approveBounty(
+      bounty1Id,
+      5, // 5-star rating
+      "ipfs://QmFeedback1/comment.json"
+    );
     await tx8.wait();
     console.log(`   ✅ Bounty #${bounty1Id} approved and paid`);
     console.log();
 
-    // ============ 4. Add Reputation Feedback ============
-    console.log("📝 [4/4] Adding reputation feedback...");
-    
-    const feedbackHash = ethers.keccak256(ethers.toUtf8Bytes("Great work on the security audit!"));
-    const tx9 = await reputationRegistry.connect(creator).submitFeedback(
-      creatorAgentId,
-      hunter1AgentId,
-      bounty1Id,
-      5, // 5-star rating
-      "ipfs://QmFeedback1/comment.json",
-      feedbackHash
-    );
-    await tx9.wait();
-    console.log(`   ✅ Feedback submitted: Creator → Hunter1 (5 stars)`);
+    // ============ 5. Verify Final State ============
+    console.log("📝 [5/5] Verifying final state...");
+
+    // Check hunter1 reputation
+    const hunter1Reputation = await reputationRegistry.getReputationScore(hunter1AgentId);
+    console.log(`   ✅ Hunter1 reputation: ${hunter1Reputation}`);
+
+    // Check bounty statuses
+    const bounty1 = await bountyRegistry.getBounty(bounty1Id);
+    const bounty2 = await bountyRegistry.getBounty(bounty2Id);
+    console.log(`   ✅ Bounty #${bounty1Id} status: ${getStatusName(Number(bounty1.status))}`);
+    console.log(`   ✅ Bounty #${bounty2Id} status: ${getStatusName(Number(bounty2.status))}`);
     console.log();
 
-    // ============ 5. Print Summary ============
+    // ============ 6. Print Summary ============
     printSummary({
       agents: [
         { id: creatorAgentId, address: creator.address, role: "Creator" },
@@ -194,6 +218,7 @@ async function main() {
         { id: bounty1Id, reward: "10 USDC", status: "Completed" },
         { id: bounty2Id, reward: "25 USDC", status: "Open" },
       ],
+      tokenAddress: usdcAddress,
     });
 
     console.log("🎉 Test data seeded successfully!");
@@ -209,6 +234,14 @@ async function main() {
   }
 }
 
+function getStatusName(status: number): string {
+  const statuses = [
+    "Open", "Claimed", "InProgress", "Submitted", "UnderReview",
+    "Approved", "Rejected", "Disputed", "Paid", "Cancelled", "Expired"
+  ];
+  return statuses[status] || "Unknown";
+}
+
 function printSummary(data: any) {
   console.log("=".repeat(60));
   console.log("📋 SEED SUMMARY");
@@ -221,6 +254,8 @@ function printSummary(data: any) {
   data.bounties.forEach((bounty: any) => {
     console.log(`  #${bounty.id} ${bounty.reward.padEnd(10)} [${bounty.status}]`);
   });
+  console.log("\nToken:");
+  console.log(`  Mock USDC: ${data.tokenAddress}`);
   console.log("=".repeat(60));
 }
 

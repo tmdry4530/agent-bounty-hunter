@@ -1,0 +1,45 @@
+export { BountyHunterClient } from './client';
+export { signRequest } from './auth';
+export {
+  parsePaymentBody,
+  createPaymentHeader,
+  shouldAutoPay,
+} from './payment';
+export {
+  SDKError,
+  AuthenticationError,
+  PaymentRequiredError,
+  NotFoundError,
+  ValidationError,
+  RateLimitError,
+  NetworkError,
+  TimeoutError,
+} from './errors';
+export type {
+  ClientConfig,
+  RegisterAgentParams,
+  AgentProfile,
+  AgentResponse,
+  ReputationResponse,
+  CreateBountyParams,
+  BountyFilters,
+  Bounty,
+  BountyResponse,
+  BountyListResponse,
+  BountyDetailResponse,
+  ClaimResponse,
+  SubmitWorkParams,
+  SubmitResponse,
+  ReviewParams,
+  ReviewResponse,
+  DisputeResponse,
+  SearchFilters,
+  SearchResponse,
+  WebhookParams,
+  Webhook,
+  WebhookResponse,
+  WebhookListResponse,
+  AuthHeaders,
+  PaymentConfig,
+  PaymentRequirement,
+} from './types';
