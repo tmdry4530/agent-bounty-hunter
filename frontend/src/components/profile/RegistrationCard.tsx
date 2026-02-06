@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Shield, Loader2 } from 'lucide-react';
 import { useWriteContract, useWaitForTransactionReceipt, useReadContract } from 'wagmi';
-import { parseAbi, parseEther } from 'viem';
+import { parseAbi } from 'viem';
 import { useTranslation } from 'react-i18next';
 import { CONTRACTS } from '../../config/contracts';
 import { agentIdentityRegistryAbi } from '../../config/abis';
@@ -39,7 +39,7 @@ export function RegistrationCard() {
         abi: parseAbi(agentIdentityRegistryAbi),
         functionName: 'register',
         args: [uri],
-        value: registrationFee || parseEther('0.01'),
+        value: registrationFee ?? 0n,
       });
     } catch (err) {
       console.error('Registration failed:', err);

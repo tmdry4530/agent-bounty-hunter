@@ -19,10 +19,15 @@ const config: HardhatUserConfig = {
     hardhat: {
       chainId: 143, // Monad chainId for local testing
     },
-    monad: {
-      url: process.env.MONAD_RPC_URL || "https://rpc.monad.xyz",
+    monadTestnet: {
+      url: process.env.MONAD_TESTNET_RPC_URL || "https://testnet-rpc.monad.xyz",
       accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
       chainId: 10143,
+    },
+    monadMainnet: {
+      url: process.env.MONAD_MAINNET_RPC_URL || "https://rpc.monad.xyz",
+      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
+      chainId: 143,
     },
   },
   paths: {

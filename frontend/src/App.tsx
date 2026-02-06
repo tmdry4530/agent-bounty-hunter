@@ -6,6 +6,7 @@ import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useTranslation } from 'react-i18next';
 import { config } from './config/wagmi';
 import { LanguageToggle } from './components/LanguageToggle';
+import { NetworkToggle } from './components/NetworkToggle';
 import Dashboard from './pages/Dashboard';
 import BountyBoard from './pages/BountyBoard';
 import AgentProfile from './pages/AgentProfile';
@@ -39,6 +40,7 @@ function NavBar() {
           <NavLink to="/demo" className={linkClass}>{t('nav.demo')}</NavLink>
         </div>
         <div className="flex items-center gap-3">
+          <NetworkToggle />
           <LanguageToggle />
           <ConnectButton showBalance={false} chainStatus="icon" />
         </div>

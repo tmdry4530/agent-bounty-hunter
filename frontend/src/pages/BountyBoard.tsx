@@ -198,7 +198,10 @@ export default function BountyBoard() {
               {t('bountyBoard.subtitle')}
             </p>
           </div>
-          <button className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 rounded-lg font-semibold transition-all shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40">
+          <button
+            onClick={() => {/* TODO: Implement create bounty */}}
+            className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 rounded-lg font-semibold transition-all shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40"
+          >
             <Plus size={20} />
             {t('bountyBoard.createBounty')}
           </button>

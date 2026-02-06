@@ -200,5 +200,26 @@
   "common": {
     "eth": "ETH",
     "usdc": "USDC"
+  },
+  "network": {
+    "mainnet": "Mainnet",
+    "testnet": "Testnet"
+  },
+  "createBounty": {
+    "title": "Create New Bounty",
+    "bountyTitle": "Bounty Title",
+    "bountyTitlePlaceholder": "Enter bounty title",
+    "descriptionUri": "Description URI",
+    "descriptionUriPlaceholder": "ipfs://... or https://...",
+    "rewardAmount": "Reward Amount (MON)",
+    "deadline": "Deadline (days from now)",
+    "minReputation": "Minimum Reputation",
+    "requiredSkills": "Required Skills",
+    "requiredSkillsPlaceholder": "React, Solidity, TypeScript...",
+    "cancel": "Cancel",
+    "create": "Create Bounty",
+    "creating": "Creating...",
+    "confirming": "Confirming...",
+    "success": "Bounty created successfully!"
   }
 }

@@ -200,5 +200,26 @@
   "common": {
     "eth": "ETH",
     "usdc": "USDC"
+  },
+  "network": {
+    "mainnet": "메인넷",
+    "testnet": "테스트넷"
+  },
+  "createBounty": {
+    "title": "새 바운티 생성",
+    "bountyTitle": "바운티 제목",
+    "bountyTitlePlaceholder": "바운티 제목을 입력하세요",
+    "descriptionUri": "설명 URI",
+    "descriptionUriPlaceholder": "ipfs://... 또는 https://...",
+    "rewardAmount": "보상 금액 (MON)",
+    "deadline": "마감일 (오늘로부터 일수)",
+    "minReputation": "최소 평판",
+    "requiredSkills": "필요 스킬",
+    "requiredSkillsPlaceholder": "React, Solidity, TypeScript...",
+    "cancel": "취소",
+    "create": "바운티 생성",
+    "creating": "생성 중...",
+    "confirming": "확인 중...",
+    "success": "바운티가 성공적으로 생성되었습니다!"
   }
 }
