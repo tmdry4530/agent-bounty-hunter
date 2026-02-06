@@ -101,14 +101,22 @@ export default function AgentProfile() {
     );
   }
 
-  // Parse reputation data
-  const reputationData = reputation as [bigint, bigint, bigint, bigint, bigint, bigint, bigint] | undefined;
-  const score = reputationData ? Number(reputationData[0]) : 0;
-  const completedBounties = reputationData ? Number(reputationData[1]) : 0;
-  const totalEarnings = reputationData ? reputationData[2] : 0n;
-  const avgRating = reputationData ? Number(reputationData[3]) : 0;
-  const totalRatings = reputationData ? Number(reputationData[4]) : 0;
-  const successRate = reputationData ? Number(reputationData[5]) : 0;
+  // Parse reputation data - viem returns named struct as object, not array
+  const reputationData = reputation as {
+    score: bigint;
+    completedBounties: bigint;
+    totalEarnings: bigint;
+    avgRating: bigint;
+    totalRatings: bigint;
+    successRate: bigint;
+    totalAttempts: bigint;
+  } | undefined;
+  const score = reputationData ? Number(reputationData.score) : 0;
+  const completedBounties = reputationData ? Number(reputationData.completedBounties) : 0;
+  const totalEarnings = reputationData ? reputationData.totalEarnings : 0n;
+  const avgRating = reputationData ? Number(reputationData.avgRating) : 0;
+  const totalRatings = reputationData ? Number(reputationData.totalRatings) : 0;
+  const successRate = reputationData ? Number(reputationData.successRate) : 0;
   // Registered - show full profile
   return (
     <div className="min-h-screen bg-gray-950 pt-24 px-4 pb-12">
